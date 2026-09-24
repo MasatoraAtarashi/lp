@@ -1,0 +1,285 @@
+t which the video will be deleted.
+     */
+    scheduledDeletion: string | null;
+    /**
+     * The size of the video in bytes.
+     */
+    size: number;
+    /**
+     * The preview URL for the video.
+     */
+    preview?: string;
+    /**
+     * Origins allowed to display the video.
+     */
+    allowedOrigins: Array<string>;
+    /**
+     * Indicates whether signed URLs are required.
+     */
+    requireSignedURLs: boolean | null;
+    /**
+     * The date and time the video was uploaded.
+     */
+    uploaded: string | null;
+    /**
+     * The date and time when the upload URL expires.
+     */
+    uploadExpiry: string | null;
+    /**
+     * The maximum size in bytes for direct uploads.
+     */
+    maxSizeBytes: number | null;
+    /**
+     * The maximum duration in seconds for direct uploads.
+     */
+    maxDurationSeconds: number | null;
+    /**
+     * The video duration in seconds. -1 indicates unknown.
+     */
+    duration: number;
+    /**
+     * Input metadata for the original upload.
+     */
+    input: StreamVideoInput;
+    /**
+     * Playback URLs for the video.
+     */
+    hlsPlaybackUrl: string;
+    dashPlaybackUrl: string;
+    /**
+     * The watermark applied to the video, if any.
+     */
+    watermark: StreamWatermark | null;
+    /**
+     * The live input id associated with the video, if any.
+     */
+    liveInputId?: string | null;
+    /**
+     * The source video id if this is a clip.
+     */
+    clippedFromId: string | null;
+    /**
+     * Public details associated with the video.
+     */
+    publicDetails: StreamPublicDetails | null;
+}
+type StreamVideoStatus = {
+    /**
+     * The current processing state.
+     */
+    state: string;
+    /**
+     * The current processing step.
+     */
+    step?: string;
+    /**
+     * The percent complete as a string.
+     */
+    pctComplete?: string;
+    /**
+     * An error reason code, if applicable.
+     */
+    errorReasonCode: string;
+    /**
+     * An error reason text, if applicable.
+     */
+    errorReasonText: string;
+};
+type StreamVideoInput = {
+    /**
+     * The input width in pixels.
+     */
+    width: number;
+    /**
+     * The input height in pixels.
+     */
+    height: number;
+};
+type StreamPublicDetails = {
+    /**
+     * The public title for the video.
+     */
+    title: string | null;
+    /**
+     * The public share link.
+     */
+    share_link: string | null;
+    /**
+     * The public channel link.
+     */
+    channel_link: string | null;
+    /**
+     * The public logo URL.
+     */
+    logo: string | null;
+};
+type StreamDirectUpload = {
+    /**
+     * The URL an unauthenticated upload can use for a single multipart request.
+     */
+    uploadURL: string;
+    /**
+     * A Cloudflare-generated unique identifier for a media item.
+     */
+    id: string;
+    /**
+     * The watermark profile applied to the upload.
+     */
+    watermark: StreamWatermark | null;
+    /**
+     * The scheduled deletion time, if any.
+     */
+    scheduledDeletion: string | null;
+};
+type StreamDirectUploadCreateParams = {
+    /**
+     * The maximum duration in seconds for a video upload.
+     */
+    maxDurationSeconds: number;
+    /**
+     * The date and time after upload when videos will not be accepted.
+     */
+    expiry?: string;
+    /**
+     * A user-defined identifier for the media creator.
+     */
+    creator?: string;
+    /**
+     * A user modifiable key-value store used to reference other systems of record for
+     * managing videos.
+     */
+    meta?: Record<string, string>;
+    /**
+     * Lists the origins allowed to display the video.
+     */
+    allowedOrigins?: Array<string>;
+    /**
+     * Indicates whether the video can be accessed using the id. When set to `true`,
+     * a signed token must be generated with a signing key to view the video.
+     */
+    requireSignedURLs?: boolean;
+    /**
+     * The thumbnail timestamp percentage.
+     */
+    thumbnailTimestampPct?: number;
+    /**
+     * The date and time at which the video will be deleted. Include `null` to remove
+     * a scheduled deletion.
+     */
+    scheduledDeletion?: string | null;
+    /**
+     * The watermark profile to apply.
+     */
+    watermark?: StreamDirectUploadWatermark;
+};
+type StreamDirectUploadWatermark = {
+    /**
+     * The unique identifier for the watermark profile.
+     */
+    id: string;
+};
+type StreamUrlUploadParams = {
+    /**
+     * Lists the origins allowed to display the video. Enter allowed origin
+     * domains in an array and use `*` for wildcard subdomains. Empty arrays allow the
+     * video to be viewed on any origin.
+     */
+    allowedOrigins?: Array<string>;
+    /**
+     * A user-defined identifier for the media creator.
+     */
+    creator?: string;
+    /**
+     * A user modifiable key-value store used to reference other systems of
+     * record for managing videos.
+     */
+    meta?: Record<string, string>;
+    /**
+     * Indicates whether the video can be a accessed using the id. When
+     * set to `true`, a signed token must be generated with a signing key to view the
+     * video.
+     */
+    requireSignedURLs?: boolean;
+    /**
+     * Indicates the date and time at which the video will be deleted. Omit
+     * the field to indicate no change, or include with a `null` value to remove an
+     * existing scheduled deletion. If specified, must be at least 30 days from upload
+     * time.
+     */
+    scheduledDeletion?: string | null;
+    /**
+     * The timestamp for a thumbnail image calculated as a percentage value
+     * of the video's duration. To convert from a second-wise timestamp to a
+     * percentage, divide the desired timestamp by the total duration of the video. If
+     * this value is not set, the default thumbnail image is taken from 0s of the
+     * video.
+     */
+    thumbnailTimestampPct?: number;
+    /**
+     * The identifier for the watermark profile
+     */
+    watermarkId?: string;
+};
+interface StreamScopedCaptions {
+    /**
+     * Uploads the caption or subtitle file to the endpoint for a specific BCP47 language.
+     * One caption or subtitle file per language is allowed.
+     * @param language The BCP 47 language tag for the caption or subtitle.
+     * @param input The caption or subtitle stream to upload.
+     * @returns The created caption entry.
+     * @throws {NotFoundError} if the video is not found
+     * @throws {BadRequestError} if the language or file is invalid
+     * @throws {InternalError} if an unexpected error occurs
+     */
+    upload(language: string, input: ReadableStream): Promise<StreamCaption>;
+    /**
+     * Generate captions or subtitles for the provided language via AI.
+     * @param language The BCP 47 language tag to generate.
+     * @returns The generated caption entry.
+     * @throws {NotFoundError} if the video is not found
+     * @throws {BadRequestError} if the language is invalid
+     * @throws {StreamError} if a generated caption already exists
+     * @throws {StreamError} if the video duration is too long
+     * @throws {StreamError} if the video is missing audio
+     * @throws {StreamError} if the requested language is not supported
+     * @throws {InternalError} if an unexpected error occurs
+     */
+    generate(language: string): Promise<StreamCaption>;
+    /**
+     * Lists the captions or subtitles.
+     * Use the language parameter to filter by a specific language.
+     * @param language The optional BCP 47 language tag to filter by.
+     * @returns The list of captions or subtitles.
+     * @throws {NotFoundError} if the video or caption is not found
+     * @throws {InternalError} if an unexpected error occurs
+     */
+    list(language?: string): Promise<StreamCaption[]>;
+    /**
+     * Removes the captions or subtitles from a video.
+     * @param language The BCP 47 language tag to remove.
+     * @returns A promise that resolves when deletion completes.
+     * @throws {NotFoundError} if the video or caption is not found
+     * @throws {InternalError} if an unexpected error occurs
+     */
+    delete(language: string): Promise<void>;
+}
+interface StreamScopedDownloads {
+    /**
+     * Generates a download for a video when a video is ready to view. Available
+     * types are `default` and `audio`. Defaults to `default` when omitted.
+     * @param downloadType The download type to create.
+     * @returns The current downloads for the video.
+     * @throws {NotFoundError} if the video is not found
+     * @throws {BadRequestError} if the download type is invalid
+     * @throws {StreamError} if the video duration is too long to generate a download
+     * @throws {StreamError} if the video is not ready to stream
+     * @throws {InternalError} if an unexpected error occurs
+     */
+    generate(downloadType?: StreamDownloadType): Promise<StreamDownloadGetResponse>;
+    /**
+     * Lists the downloads created for a video.
+     * @returns The current downloads for the video.
+     * @throws {NotFoundError} if the video or downloads are not found
+     * @throws {InternalError} if an unexpected error occurs
+     */
+    get(): Promise<StreamDownlo
