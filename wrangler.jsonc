@@ -1,6 +1,6 @@
 /**
  * Wrangler 設定の詳細: https://developers.cloudflare.com/workers/wrangler/configuration/
- * squat により生成: アプリ名は scaffold 時、D1 database_id は初回の `squat deploy` で置換されます。
+ * squat により生成。アプリ名は scaffold 時に決まり、D1 database_id は本番の everyday-japan-tour-db を指す。
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
@@ -26,8 +26,8 @@
     {
       "binding": "DB",
       "database_name": "everyday-japan-tour-db",
-      // 初回デプロイ（squat deploy）時の `wrangler d1 create` の結果で置換されます
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      // 本番 D1 のリソース ID（secret ではない）。作り直した場合だけ差し替える。
+      "database_id": "51a43ff9-266e-47ee-8b77-a06f21642473",
       "migrations_dir": "migrations",
       "migrations_table": "d1_migrations",
     },
