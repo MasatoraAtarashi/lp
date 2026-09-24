@@ -191,7 +191,7 @@ interface ArtifactsRepo extends ArtifactsRepoInfo {
         defaultBranchOnly?: boolean;
     }): Promise<ArtifactsCreateRepoResult>;
 }
-// ── Error types ────────────────────────────────────────────────────────────────────
+// ── Error types ──────────────────────────────────────────────────────────────
 /**
  * Error codes returned by Artifacts binding operations.
  *
