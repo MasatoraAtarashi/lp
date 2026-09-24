@@ -1,0 +1,269 @@
+ation. */
+type AiSearchMultiSearchError = {
+    instance_id: string;
+    message: string;
+};
+/** Response from a multi-instance search, with chunks tagged by instance and optional partial-failure errors. */
+type AiSearchMultiSearchResponse = {
+    search_query: string;
+    chunks: AiSearchMultiSearchChunk[];
+    errors?: AiSearchMultiSearchError[];
+};
+/** Request for chat completions across multiple instances within a namespace. `ai_search_options` is required and must include `instance_ids`. */
+type AiSearchMultiChatCompletionsRequest = Omit<AiSearchChatCompletionsRequest, 'ai_search_options'> & {
+    ai_search_options: AiSearchMultiSearchOptions;
+};
+/** Response from multi-instance chat completions, with chunks tagged by instance and optional partial-failure errors. */
+type AiSearchMultiChatCompletionsResponse = Omit<AiSearchChatCompletionsResponse, 'chunks'> & {
+    chunks: AiSearchMultiSearchChunk[];
+    errors?: AiSearchMultiSearchError[];
+};
+// ============ AI Search Response Types ============
+type AiSearchSearchResponse = {
+    search_query: string;
+    chunks: Array<{
+        id: string;
+        type: string;
+        /** Match score (0-1) */
+        score: number;
+        text: string;
+        item: {
+            timestamp?: number;
+            key: string;
+            metadata?: Record<string, unknown>;
+        };
+        scoring_details?: {
+            /** Keyword match score (0-1) */
+            keyword_score?: number;
+            /** Vector similarity score (0-1) */
+            vector_score?: number;
+            /** Keyword rank position */
+            keyword_rank?: number;
+            /** Vector rank position */
+            vector_rank?: number;
+            /** Reranking model score */
+            reranking_score?: number;
+            /** Fusion method used to combine results */
+            fusion_method?: 'rrf' | 'max';
+            [key: string]: unknown;
+        };
+    }>;
+};
+type AiSearchChatCompletionsResponse = {
+    id?: string;
+    object?: string;
+    model?: string;
+    choices: Array<{
+        index?: number;
+        message: {
+            role: 'system' | 'developer' | 'user' | 'assistant' | 'tool';
+            content: string | null;
+            [key: string]: unknown;
+        };
+        [key: string]: unknown;
+    }>;
+    chunks: AiSearchSearchResponse['chunks'];
+    [key: string]: unknown;
+};
+type AiSearchStatsResponse = {
+    queued?: number;
+    running?: number;
+    completed?: number;
+    error?: number;
+    skipped?: number;
+    outdated?: number;
+    last_activity?: string;
+    /** Storage engine statistics. */
+    engine?: {
+        vectorize?: {
+            vectorsCount: number;
+            dimensions: number;
+        };
+        r2?: {
+            payloadSizeBytes: number;
+            metadataSizeBytes: number;
+            objectCount: number;
+        };
+    };
+};
+// ============ AI Search Instance Info Types ============
+type AiSearchInstanceInfo = {
+    id: string;
+    type?: 'r2' | 'web-crawler' | string;
+    source?: string;
+    source_params?: unknown;
+    paused?: boolean;
+    status?: string;
+    namespace?: string;
+    created_at?: string;
+    modified_at?: string;
+    token_id?: string;
+    ai_gateway_id?: string;
+    rewrite_query?: boolean;
+    reranking?: boolean;
+    embedding_model?: string;
+    ai_search_model?: string;
+    rewrite_model?: string;
+    reranking_model?: string;
+    /** @deprecated Use index_method instead. */
+    hybrid_search_enabled?: boolean;
+    /** Controls which storage backends are active. */
+    index_method?: {
+        vector?: boolean;
+        keyword?: boolean;
+    };
+    /** Fusion method for combining vector and keyword results. */
+    fusion_method?: 'max' | 'rrf';
+    indexing_options?: {
+        keyword_tokenizer?: 'porter' | 'trigram';
+    } | null;
+    retrieval_options?: {
+        keyword_match_mode?: 'and' | 'or';
+        boost_by?: Array<{
+            field: string;
+            direction?: 'asc' | 'desc' | 'exists' | 'not_exists';
+        }>;
+    } | null;
+    chunk?: boolean;
+    chunk_size?: number;
+    chunk_overlap?: number;
+    score_threshold?: number;
+    max_num_results?: number;
+    cache?: boolean;
+    cache_threshold?: 'super_strict_match' | 'close_enough' | 'flexible_friend' | 'anything_goes';
+    custom_metadata?: Array<{
+        field_name: string;
+        data_type: 'text' | 'number' | 'boolean' | 'datetime';
+    }>;
+    /** Sync interval in seconds. */
+    sync_interval?: 3600 | 7200 | 14400 | 21600 | 43200 | 86400;
+    metadata?: Record<string, unknown>;
+    [key: string]: unknown;
+};
+/** Pagination, search, and ordering parameters for listing instances within a namespace. */
+type AiSearchListInstancesParams = {
+    page?: number;
+    per_page?: number;
+    /** Search instances by ID. */
+    search?: string;
+    /** Field to sort by. */
+    order_by?: 'created_at';
+    /** Sort direction. */
+    order_by_direction?: 'asc' | 'desc';
+};
+type AiSearchListResponse = {
+    result: AiSearchInstanceInfo[];
+    result_info?: {
+        count: number;
+        page: number;
+        per_page: number;
+        total_count: number;
+    };
+};
+// ============ AI Search Config Types ============
+type AiSearchConfig = {
+    /** Instance ID (1-32 chars, pattern: ^[a-z0-9_]+(?:-[a-z0-9_]+)*$) */
+    id: string;
+    /** Instance type. Omit to create with built-in storage. */
+    type?: 'r2' | 'web-crawler' | string;
+    /** Source URL (required for web-crawler type). */
+    source?: string;
+    source_params?: unknown;
+    /** Token ID (UUID format) */
+    token_id?: string;
+    ai_gateway_id?: string;
+    /** Enable query rewriting (default false) */
+    rewrite_query?: boolean;
+    /** Enable reranking (default false) */
+    reranking?: boolean;
+    embedding_model?: string;
+    ai_search_model?: string;
+    rewrite_model?: string;
+    reranking_model?: string;
+    /** @deprecated Use index_method instead. */
+    hybrid_search_enabled?: boolean;
+    /** Controls which storage backends are used during indexing. Defaults to vector-only. */
+    index_method?: {
+        vector?: boolean;
+        keyword?: boolean;
+    };
+    /** Fusion method for combining vector and keyword results. "rrf" = reciprocal rank fusion (default), "max" = maximum score. */
+    fusion_method?: 'max' | 'rrf';
+    indexing_options?: {
+        keyword_tokenizer?: 'porter' | 'trigram';
+    } | null;
+    retrieval_options?: {
+        keyword_match_mode?: 'and' | 'or';
+        boost_by?: Array<{
+            field: string;
+            direction?: 'asc' | 'desc' | 'exists' | 'not_exists';
+        }>;
+    } | null;
+    chunk?: boolean;
+    chunk_size?: number;
+    chunk_overlap?: number;
+    /** Minimum similarity score (0-1) for a result to be included. */
+    score_threshold?: number;
+    max_num_results?: number;
+    cache?: boolean;
+    /** Similarity threshold for cache hits. Stricter = fewer cache hits but higher relevance. */
+    cache_threshold?: 'super_strict_match' | 'close_enough' | 'flexible_friend' | 'anything_goes';
+    custom_metadata?: Array<{
+        field_name: string;
+        data_type: 'text' | 'number' | 'boolean' | 'datetime';
+    }>;
+    namespace?: string;
+    /** Sync interval in seconds. 3600=1h, 7200=2h, 14400=4h, 21600=6h, 43200=12h, 86400=24h. */
+    sync_interval?: 3600 | 7200 | 14400 | 21600 | 43200 | 86400;
+    metadata?: Record<string, unknown>;
+    [key: string]: unknown;
+};
+// ============ AI Search Item Types ============
+type AiSearchItemInfo = {
+    id: string;
+    key: string;
+    status: 'completed' | 'error' | 'skipped' | 'queued' | 'running' | 'outdated';
+    next_action?: 'INDEX' | 'DELETE' | null;
+    error?: string;
+    checksum?: string;
+    namespace?: string;
+    chunks_count?: number | null;
+    file_size?: number | null;
+    source_id?: string | null;
+    last_seen_at?: string;
+    created_at?: string;
+    metadata?: Record<string, unknown>;
+    [key: string]: unknown;
+};
+type AiSearchItemContentResult = {
+    body: ReadableStream;
+    contentType: string;
+    filename: string;
+    size: number;
+};
+type AiSearchUploadItemOptions = {
+    metadata?: Record<string, unknown>;
+};
+type AiSearchListItemsParams = {
+    page?: number;
+    per_page?: number;
+    /** Search items by key name. */
+    search?: string;
+    /** Sort order for results. */
+    sort_by?: 'status' | 'modified_at';
+    /** Filter items by processing status. */
+    status?: 'queued' | 'running' | 'completed' | 'error' | 'skipped' | 'outdated';
+    /** Filter items by source (e.g. "builtin" or "web-crawler:https://example.com"). */
+    source?: string;
+    /** JSON-encoded Vectorize filter for metadata filtering. */
+    metadata_filter?: string;
+    /** Filter items by their unique ID. Returns at most one item. */
+    item_id?: string;
+    /**
+     * Filter items by their exact key (object key / filename). Keys are unique
+     * per source, so combine with `source` to disambiguate across data sources.
+     */
+    key?: string;
+};
+type AiSearchListItemsResponse = {
+    r
