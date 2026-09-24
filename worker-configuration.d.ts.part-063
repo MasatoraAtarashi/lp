@@ -1,0 +1,233 @@
+urns A promise that resolves with matched and scored vectors.
+     */
+    public query(vector: VectorFloatArray | number[], options?: VectorizeQueryOptions): Promise<VectorizeMatches>;
+    /**
+     * Insert a list of vectors into the index dataset. If a provided id exists, an error will be thrown.
+     * @param vectors List of vectors that will be inserted.
+     * @returns A promise that resolves with the ids & count of records that were successfully processed.
+     */
+    public insert(vectors: VectorizeVector[]): Promise<VectorizeVectorMutation>;
+    /**
+     * Upsert a list of vectors into the index dataset. If a provided id exists, it will be replaced with the new values.
+     * @param vectors List of vectors that will be upserted.
+     * @returns A promise that resolves with the ids & count of records that were successfully processed.
+     */
+    public upsert(vectors: VectorizeVector[]): Promise<VectorizeVectorMutation>;
+    /**
+     * Delete a list of vectors with a matching id.
+     * @param ids List of vector ids that should be deleted.
+     * @returns A promise that resolves with the ids & count of records that were successfully processed (and thus deleted).
+     */
+    public deleteByIds(ids: string[]): Promise<VectorizeVectorMutation>;
+    /**
+     * Get a list of vectors with a matching id.
+     * @param ids List of vector ids that should be returned.
+     * @returns A promise that resolves with the raw unscored vectors matching the id set.
+     */
+    public getByIds(ids: string[]): Promise<VectorizeVector[]>;
+}
+/**
+ * A Vectorize Vector Search Index for querying vectors/embeddings.
+ *
+ * Mutations in this version are async, returning a mutation id.
+ */
+declare abstract class Vectorize {
+    /**
+     * Get information about the currently bound index.
+     * @returns A promise that resolves with information about the current index.
+     */
+    public describe(): Promise<VectorizeIndexInfo>;
+    /**
+     * Use the provided vector to perform a similarity search across the index.
+     * @param vector Input vector that will be used to drive the similarity search.
+     * @param options Configuration options to massage the returned data.
+     * @returns A promise that resolves with matched and scored vectors.
+     */
+    public query(vector: VectorFloatArray | number[], options?: VectorizeQueryOptions): Promise<VectorizeMatches>;
+    /**
+     * Use the provided vector-id to perform a similarity search across the index.
+     * @param vectorId Id for a vector in the index against which the index should be queried.
+     * @param options Configuration options to massage the returned data.
+     * @returns A promise that resolves with matched and scored vectors.
+     */
+    public queryById(vectorId: string, options?: VectorizeQueryOptions): Promise<VectorizeMatches>;
+    /**
+     * Insert a list of vectors into the index dataset. If a provided id exists, an error will be thrown.
+     * @param vectors List of vectors that will be inserted.
+     * @returns A promise that resolves with a unique identifier of a mutation containing the insert changeset.
+     */
+    public insert(vectors: VectorizeVector[]): Promise<VectorizeAsyncMutation>;
+    /**
+     * Upsert a list of vectors into the index dataset. If a provided id exists, it will be replaced with the new values.
+     * @param vectors List of vectors that will be upserted.
+     * @returns A promise that resolves with a unique identifier of a mutation containing the upsert changeset.
+     */
+    public upsert(vectors: VectorizeVector[]): Promise<VectorizeAsyncMutation>;
+    /**
+     * Delete a list of vectors with a matching id.
+     * @param ids List of vector ids that should be deleted.
+     * @returns A promise that resolves with a unique identifier of a mutation containing the delete changeset.
+     */
+    public deleteByIds(ids: string[]): Promise<VectorizeAsyncMutation>;
+    /**
+     * Get a list of vectors with a matching id.
+     * @param ids List of vector ids that should be returned.
+     * @returns A promise that resolves with the raw unscored vectors matching the id set.
+     */
+    public getByIds(ids: string[]): Promise<VectorizeVector[]>;
+}
+/**
+ * The interface for "version_metadata" binding
+ * providing metadata about the Worker Version using this binding.
+ */
+type WorkerVersionMetadata = {
+    /** The ID of the Worker Version using this binding */
+    id: string;
+    /** The tag of the Worker Version using this binding */
+    tag: string;
+    /** The timestamp of when the Worker Version was uploaded */
+    timestamp: string;
+};
+// ============ Web Search Request Types ============
+/**
+ * Options for a Web Search query.
+ */
+type WebSearchSearchOptions = {
+    /** The search query. */
+    query: string;
+    /**
+     * Maximum number of results to return. Defaults to 10, capped at 20.
+     * The actual count may be lower if fewer matches exist.
+     */
+    limit?: number;
+};
+// ============ Web Search Response Types ============
+/**
+ * A single Web Search result.
+ *
+ * Web Search is discovery-only -- results carry catalog metadata about a page
+ * but never the page body. To read a result's content the caller invokes the
+ * global `fetch()` API against the result's `url`, at which point the
+ * destination's own access controls apply (including Cloudflare Pay-per-Crawl).
+ */
+type WebSearchResult = {
+    /** Canonical URL. */
+    url: string;
+    /** Page title. */
+    title: string;
+    /** Page-level description. May be absent. */
+    description?: string;
+    /**
+     * Last-modified date for the page, when known. Naive (no timezone)
+     * ISO-8601 datetime, e.g. `"2025-11-30T04:39:48"`.
+     */
+    lastModifiedDate?: string;
+    /**
+     * Page meta image URL (typically the `og:image`). May be absent.
+     */
+    imageUrl?: string;
+    /** Optional favicon URL for UI hints. */
+    faviconUrl?: string;
+};
+/**
+ * Per-response metadata for a Web Search query. Carries operational
+ * fields useful for support and debugging.
+ */
+type WebSearchResponseMetadata = {
+    /** The query that was executed. */
+    query: string;
+    /** Opaque request identifier used for support and debugging. */
+    requestId: string;
+    /** End-to-end latency for this search request, in milliseconds. */
+    latencyMs: number;
+};
+/**
+ * Response from a Web Search query.
+ */
+type WebSearchSearchResponse = {
+    items: WebSearchResult[];
+    metadata: WebSearchResponseMetadata;
+};
+// ============ Web Search Binding Class ============
+/**
+ * Cloudflare Web Search binding.
+ *
+ * Discovery-only primitive for agents and Workers. Returns URLs and catalog
+ * metadata for a query; never returns page content or excerpts. To read a
+ * result's body, fetch the URL with the global `fetch()` API.
+ *
+ * Declared in wrangler with a single object (there is exactly one corpus, the
+ * public web, so there is no name, namespace, or instance to specify):
+ *
+ * ```jsonc
+ * { "web_search": { "binding": "WEBSEARCH" } }
+ * ```
+ *
+ * @example
+ * ```ts
+ * const { items, metadata } = await env.WEBSEARCH.search({
+ *   query: "Cloudflare Workers",
+ * });
+ *
+ * const top = items[0];
+ * console.log(top.url, top.title, metadata.latencyMs);
+ *
+ * // Read content yourself; pay-per-crawl and other publisher
+ * // controls apply at the fetch site, not at search time.
+ * const page = await fetch(top.url);
+ * ```
+ */
+declare abstract class WebSearch {
+    /**
+     * Run a Web Search query.
+     * @param options Search options. Only `query` is required.
+     * @returns The matching results plus per-response metadata.
+     */
+    search(options: WebSearchSearchOptions): Promise<WebSearchSearchResponse>;
+}
+interface DynamicDispatchLimits {
+    /**
+     * Limit CPU time in milliseconds.
+     */
+    cpuMs?: number;
+    /**
+     * Limit number of subrequests.
+     */
+    subRequests?: number;
+}
+interface DynamicDispatchOptions {
+    /**
+     * Limit resources of invoked Worker script.
+     */
+    limits?: DynamicDispatchLimits;
+    /**
+     * Arguments for outbound Worker script, if configured.
+     */
+    outbound?: {
+        [key: string]: any;
+    };
+}
+interface DispatchNamespace {
+    /**
+    * @param name Name of the Worker script.
+    * @param args Arguments to Worker script.
+    * @param options Options for Dynamic Dispatch invocation.
+    * @returns A Fetcher object that allows you to send requests to the Worker script.
+    * @throws If the Worker script does not exist in this dispatch namespace, an error will be thrown.
+    */
+    get(name: string, args?: {
+        [key: string]: any;
+    }, options?: DynamicDispatchOptions): Fetcher;
+}
+declare module 'cloudflare:workflows' {
+    /**
+     * NonRetryableError allows for a user to throw a fatal error
+     * that makes a Workflow instance fail immediately without triggering a retry
+     */
+    export class NonRetryableError extends Error {
+        public constructor(message: string, name?: string);
+    }
+}
+declare abstract class Workflow<PARAMS = unknown> {
+    /**
+     * Get a h
