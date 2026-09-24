@@ -1,0 +1,207 @@
+WorkflowStepSensitivity;
+        };
+    };
+    // The rollback handler receives the step context, so it mirrors the same
+    // delay discriminant as the step callback: when the step was configured with
+    // a dynamic delay function the resolved `config.retries.delay` is omitted,
+    // otherwise it is present. `Delay` is threaded from the `WorkflowStep.do`
+    // overload that matched the step config.
+    export type WorkflowRollbackContext<T = unknown, Delay = WorkflowDelayDuration | number> = {
+        ctx: WorkflowStepContext<Delay>;
+        error: Error;
+        output: T | undefined;
+        /** @deprecated Use `ctx.step.name` and `ctx.step.count` instead. */
+        stepName: string;
+    };
+    export type WorkflowRollbackHandler<T = unknown, Delay = WorkflowDelayDuration | number> = (ctx: WorkflowRollbackContext<T, Delay>) => Promise<void>;
+    export type WorkflowStepRollbackOptions<T = unknown, Delay = WorkflowDelayDuration | number> = {
+        rollback: WorkflowRollbackHandler<T, Delay>;
+        rollbackConfig?: WorkflowStepRollbackConfig;
+    };
+    export abstract class WorkflowStep {
+        do<T extends Rpc.Serializable<T>>(name: string, callback: (ctx: WorkflowStepContext) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T>): Promise<T>;
+        // The config overloads discriminate on the shape of `config.retries.delay`
+        // so the callback context reflects whether the resolved delay is present
+        // (static delay) or omitted (dynamic delay function). Each has a single
+        // type parameter, so an explicit return-type argument (`do<T>(...)`) still
+        // resolves here. ORDERING IS LOAD-BEARING: the broad `WorkflowStepConfig`
+        // fallback MUST remain last, otherwise it shadows the discriminating
+        // overloads and narrowing is silently lost.
+        do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithDelayFunction, callback: (ctx: WorkflowStepContext<WorkflowDelayFunction>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayFunction>): Promise<T>;
+        do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfigWithStaticDelay, callback: (ctx: WorkflowStepContext<WorkflowDelayDuration | number>) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T, WorkflowDelayDuration | number>): Promise<T>;
+        do<T extends Rpc.Serializable<T>>(name: string, config: WorkflowStepConfig, callback: (ctx: WorkflowStepContext) => Promise<T>, rollbackOptions?: WorkflowStepRollbackOptions<T>): Promise<T>;
+        sleep: (name: string, duration: WorkflowSleepDuration) => Promise<void>;
+        sleepUntil: (name: string, timestamp: Date | number) => Promise<void>;
+        waitForEvent<T extends Rpc.Serializable<T>>(name: string, options: {
+            type: string;
+            timeout?: WorkflowTimeoutDuration | number;
+        }): Promise<WorkflowStepEvent<T>>;
+    }
+    export type WorkflowInstanceStatus = 'queued' | 'running' | 'paused' | 'errored' | 'terminated' | 'complete' | 'waiting' | 'waitingForPause' | 'unknown';
+    export abstract class WorkflowEntrypoint<Env = unknown, T extends Rpc.Serializable<T> | unknown = unknown> implements Rpc.WorkflowEntrypointBranded {
+        [Rpc.__WORKFLOW_ENTRYPOINT_BRAND]: never;
+        protected ctx: ExecutionContext;
+        protected env: Env;
+        constructor(ctx: ExecutionContext, env: Env);
+        run(event: Readonly<WorkflowEvent<T>>, step: WorkflowStep): Promise<unknown>;
+    }
+    export function waitUntil(promise: Promise<unknown>): void;
+    export function withEnv(newEnv: unknown, fn: () => unknown): unknown;
+    export function withExports(newExports: unknown, fn: () => unknown): unknown;
+    export function withEnvAndExports(newEnv: unknown, newExports: unknown, fn: () => unknown): unknown;
+    export const env: Cloudflare.Env;
+    export const exports: Cloudflare.Exports;
+    export const cache: CacheContext;
+    export const tracing: Tracing;
+}
+declare module 'cloudflare:workers' {
+    export = CloudflareWorkersModule;
+}
+interface SecretsStoreSecret {
+    /**
+     * Get a secret from the Secrets Store, returning a string of the secret value
+     * if it exists, or throws an error if it does not exist
+     */
+    get(): Promise<string>;
+}
+declare module "cloudflare:sockets" {
+    function _connect(address: string | SocketAddress, options?: SocketOptions): Socket;
+    export { _connect as connect };
+}
+/**
+ * Binding entrypoint for Cloudflare Stream.
+ *
+ * Usage:
+ * - Binding-level operations:
+ *   `await env.STREAM.videos.upload`
+ *   `await env.STREAM.videos.createDirectUpload`
+ *   `await env.STREAM.videos.*`
+ *   `await env.STREAM.watermarks.*`
+ * - Per-video operations:
+ *   `await env.STREAM.video(id).downloads.*`
+ *   `await env.STREAM.video(id).captions.*`
+ *
+ * Example usage:
+ * ```ts
+ * await env.STREAM.video(id).downloads.generate();
+ *
+ * const video = env.STREAM.video(id)
+ * const captions = video.captions.list();
+ * const videoDetails = video.details()
+ * ```
+ */
+interface StreamBinding {
+    /**
+     * Returns a handle scoped to a single video for per-video operations.
+     * @param id The unique identifier for the video.
+     * @returns A handle for per-video operations.
+     */
+    video(id: string): StreamVideoHandle;
+    /**
+     * Uploads a new video from a provided URL.
+     * @param url The URL to upload from.
+     * @param params Optional upload parameters.
+     * @returns The uploaded video details.
+     * @throws {BadRequestError} if the upload parameter is invalid or the URL is invalid
+     * @throws {QuotaReachedError} if the account storage capacity is exceeded
+     * @throws {MaxFileSizeError} if the file size is too large
+     * @throws {RateLimitedError} if the server received too many requests
+     * @throws {AlreadyUploadedError} if a video was already uploaded to this URL
+     * @throws {InternalError} if an unexpected error occurs
+     */
+    upload(url: string, params?: StreamUrlUploadParams): Promise<StreamVideo>;
+    /**
+     * Creates a direct upload that allows video uploads without an API key.
+     * @param params Parameters for the direct upload
+     * @returns The direct upload details.
+     * @throws {BadRequestError} if the parameters are invalid
+     * @throws {RateLimitedError} if the server received too many requests
+     * @throws {InternalError} if an unexpected error occurs
+     */
+    createDirectUpload(params: StreamDirectUploadCreateParams): Promise<StreamDirectUpload>;
+    videos: StreamVideos;
+    watermarks: StreamWatermarks;
+}
+/**
+ * Handle for operations scoped to a single Stream video.
+ */
+interface StreamVideoHandle {
+    /**
+     * The unique identifier for the video.
+     */
+    id: string;
+    /**
+     * Get a full videos details
+     * @returns The full video details.
+     * @throws {NotFoundError} if the video is not found
+     * @throws {InternalError} if an unexpected error occurs
+     */
+    details(): Promise<StreamVideo>;
+    /**
+     * Update details for a single video.
+     * @param params The fields to update for the video.
+     * @returns The updated video details.
+     * @throws {NotFoundError} if the video is not found
+     * @throws {BadRequestError} if the parameters are invalid
+     * @throws {InternalError} if an unexpected error occurs
+     */
+    update(params: StreamUpdateVideoParams): Promise<StreamVideo>;
+    /**
+     * Deletes a video and its copies from Cloudflare Stream.
+     * @returns A promise that resolves when deletion completes.
+     * @throws {NotFoundError} if the video is not found
+     * @throws {InternalError} if an unexpected error occurs
+     */
+    delete(): Promise<void>;
+    /**
+     * Creates a signed URL token for a video.
+     * @returns The signed token that was created.
+     * @throws {InternalError} if the signing key cannot be retrieved or the token cannot be signed
+     */
+    generateToken(): Promise<string>;
+    downloads: StreamScopedDownloads;
+    captions: StreamScopedCaptions;
+}
+interface StreamVideo {
+    /**
+     * The unique identifier for the video.
+     */
+    id: string;
+    /**
+     * A user-defined identifier for the media creator.
+     */
+    creator: string | null;
+    /**
+     * The thumbnail URL for the video.
+     */
+    thumbnail: string;
+    /**
+     * The thumbnail timestamp percentage.
+     */
+    thumbnailTimestampPct: number;
+    /**
+     * Indicates whether the video is ready to stream.
+     */
+    readyToStream: boolean;
+    /**
+     * The date and time the video became ready to stream.
+     */
+    readyToStreamAt: string | null;
+    /**
+     * Processing status information.
+     */
+    status: StreamVideoStatus;
+    /**
+     * A user modifiable key-value store.
+     */
+    meta: Record<string, string>;
+    /**
+     * The date and time the video was created.
+     */
+    created: string;
+    /**
+     * The date and time the video was last modified.
+     */
+    modified: string;
+    /**
+     * The date and time a
