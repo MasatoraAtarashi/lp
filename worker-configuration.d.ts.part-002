@@ -1,0 +1,157 @@
+;
+    FixedLengthStream: typeof FixedLengthStream;
+    IdentityTransformStream: typeof IdentityTransformStream;
+    HTMLRewriter: typeof HTMLRewriter;
+}
+declare function addEventListener<Type extends keyof WorkerGlobalScopeEventMap>(type: Type, handler: EventListenerOrEventListenerObject<WorkerGlobalScopeEventMap[Type]>, options?: EventTargetAddEventListenerOptions | boolean): void;
+declare function removeEventListener<Type extends keyof WorkerGlobalScopeEventMap>(type: Type, handler: EventListenerOrEventListenerObject<WorkerGlobalScopeEventMap[Type]>, options?: EventTargetEventListenerOptions | boolean): void;
+/**
+ * The **`dispatchEvent()`** method of the EventTarget sends an Event to the object, (synchronously) invoking the affected event listeners in the appropriate order. The normal event processing rules (including the capturing and optional bubbling phase) also apply to events dispatched manually with dispatchEvent().
+ *
+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/EventTarget/dispatchEvent)
+ */
+declare function dispatchEvent(event: WorkerGlobalScopeEventMap[keyof WorkerGlobalScopeEventMap]): boolean;
+/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/btoa) */
+declare function btoa(data: string): string;
+/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/atob) */
+declare function atob(data: string): string;
+/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/setTimeout) */
+declare function setTimeout(callback: (...args: any[]) => void, msDelay?: number): number;
+/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/setTimeout) */
+declare function setTimeout<Args extends any[]>(callback: (...args: Args) => void, msDelay?: number, ...args: Args): number;
+/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/clearTimeout) */
+declare function clearTimeout(timeoutId: number | null): void;
+/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/setInterval) */
+declare function setInterval(callback: (...args: any[]) => void, msDelay?: number): number;
+/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/setInterval) */
+declare function setInterval<Args extends any[]>(callback: (...args: Args) => void, msDelay?: number, ...args: Args): number;
+/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/clearInterval) */
+declare function clearInterval(timeoutId: number | null): void;
+/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/queueMicrotask) */
+declare function queueMicrotask(task: Function): void;
+/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/structuredClone) */
+declare function structuredClone<T>(value: T, options?: StructuredSerializeOptions): T;
+/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/reportError) */
+declare function reportError(error: any): void;
+/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/fetch) */
+declare function fetch(input: RequestInfo | URL, init?: RequestInit<RequestInitCfProperties>): Promise<Response>;
+declare const self: ServiceWorkerGlobalScope;
+/**
+* The Web Crypto API provides a set of low-level functions for common cryptographic tasks.
+* The Workers runtime implements the full surface of this API, but with some differences in
+* the [supported algorithms](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/#supported-algorithms)
+* compared to those implemented in most browsers.
+*
+* [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/web-crypto/)
+*/
+declare const crypto: Crypto;
+/**
+* The Cache API allows fine grained control of reading and writing from the Cloudflare global network cache.
+*
+* [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/cache/)
+*/
+declare const caches: CacheStorage;
+/* [MDN Reference](https://developer.mozilla.org/docs/Web/API/Window/scheduler) */
+declare const scheduler: Scheduler;
+/**
+* The Workers runtime supports a subset of the Performance API, used to measure timing and performance,
+* as well as timing of subrequests and other operations.
+*
+* [Cloudflare Docs Reference](https://developers.cloudflare.com/workers/runtime-apis/performance/)
+*/
+declare const performance: Performance;
+declare const Cloudflare: Cloudflare;
+declare const origin: string;
+declare const navigator: Navigator;
+interface TestController {
+}
+interface ExecutionContext<Props = unknown> {
+    waitUntil(promise: Promise<any>): void;
+    passThroughOnException(): void;
+    readonly props: Props;
+    cache?: CacheContext;
+    readonly access?: CloudflareAccessContext;
+    tracing: Tracing;
+    abort(reason?: any): void;
+}
+type ExportedHandlerFetchHandler<Env = unknown, CfHostMetadata = unknown, Props = unknown> = (request: Request<CfHostMetadata, IncomingRequestCfProperties<CfHostMetadata>>, env: Env, ctx: ExecutionContext<Props>) => Response | Promise<Response>;
+type ExportedHandlerConnectHandler<Env = unknown, Props = unknown> = (socket: Socket, env: Env, ctx: ExecutionContext<Props>) => void | Promise<void>;
+type ExportedHandlerTailHandler<Env = unknown, Props = unknown> = (events: TraceItem[], env: Env, ctx: ExecutionContext<Props>) => void | Promise<void>;
+type ExportedHandlerTraceHandler<Env = unknown, Props = unknown> = (traces: TraceItem[], env: Env, ctx: ExecutionContext<Props>) => void | Promise<void>;
+type ExportedHandlerTailStreamHandler<Env = unknown, Props = unknown> = (event: TailStream.TailEvent<TailStream.Onset>, env: Env, ctx: ExecutionContext<Props>) => TailStream.TailEventHandlerType | Promise<TailStream.TailEventHandlerType>;
+type ExportedHandlerScheduledHandler<Env = unknown, Props = unknown> = (controller: ScheduledController, env: Env, ctx: ExecutionContext<Props>) => void | Promise<void>;
+type ExportedHandlerQueueHandler<Env = unknown, Message = unknown, Props = unknown> = (batch: MessageBatch<Message>, env: Env, ctx: ExecutionContext<Props>) => void | Promise<void>;
+type ExportedHandlerTestHandler<Env = unknown, Props = unknown> = (controller: TestController, env: Env, ctx: ExecutionContext<Props>) => void | Promise<void>;
+interface ExportedHandler<Env = unknown, QueueHandlerMessage = unknown, CfHostMetadata = unknown, Props = unknown> {
+    fetch?: ExportedHandlerFetchHandler<Env, CfHostMetadata, Props>;
+    connect?: ExportedHandlerConnectHandler<Env, Props>;
+    tail?: ExportedHandlerTailHandler<Env, Props>;
+    trace?: ExportedHandlerTraceHandler<Env, Props>;
+    tailStream?: ExportedHandlerTailStreamHandler<Env, Props>;
+    scheduled?: ExportedHandlerScheduledHandler<Env, Props>;
+    test?: ExportedHandlerTestHandler<Env, Props>;
+    email?: EmailExportedHandler<Env, Props>;
+    queue?: ExportedHandlerQueueHandler<Env, QueueHandlerMessage, Props>;
+}
+interface StructuredSerializeOptions {
+    transfer?: any[];
+}
+declare abstract class Navigator {
+    sendBeacon(url: string, body?: BodyInit): boolean;
+    readonly userAgent: string;
+    readonly hardwareConcurrency: number;
+    readonly platform: string;
+    readonly language: string;
+    readonly languages: string[];
+}
+interface AlarmInvocationInfo {
+    readonly isRetry: boolean;
+    readonly retryCount: number;
+    readonly scheduledTime: number;
+}
+interface Cloudflare {
+    readonly compatibilityFlags: Record<string, boolean>;
+}
+interface CachePurgeError {
+    code: number;
+    message: string;
+}
+interface CachePurgeResult {
+    success: boolean;
+    errors: CachePurgeError[];
+}
+interface CachePurgeOptions {
+    tags?: string[];
+    pathPrefixes?: string[];
+    purgeEverything?: boolean;
+}
+interface CacheContext {
+    purge(options: CachePurgeOptions): Promise<CachePurgeResult>;
+}
+interface CloudflareAccessContext {
+    readonly aud: string;
+    getIdentity(): Promise<CloudflareAccessIdentity | undefined>;
+}
+declare abstract class ColoLocalActorNamespace {
+    get(actorId: string): Fetcher;
+}
+interface DurableObject {
+    fetch(request: Request): Response | Promise<Response>;
+    connect?(socket: Socket): void | Promise<void>;
+    alarm?(alarmInfo?: AlarmInvocationInfo): void | Promise<void>;
+    webSocketMessage?(ws: WebSocket, message: string | ArrayBuffer): void | Promise<void>;
+    webSocketClose?(ws: WebSocket, code: number, reason: string, wasClean: boolean): void | Promise<void>;
+    webSocketError?(ws: WebSocket, error: unknown): void | Promise<void>;
+}
+type DurableObjectStub<T extends Rpc.DurableObjectBranded | undefined = undefined> = Fetcher<T, "alarm" | "connect" | "webSocketMessage" | "webSocketClose" | "webSocketError"> & {
+    readonly id: DurableObjectId;
+    readonly name?: string;
+};
+interface DurableObjectId {
+    toString(): string;
+    equals(other: DurableObjectId): boolean;
+    readonly name?: string;
+    readonly jurisdiction?: string;
+}
+declare abstract class DurableObjectNamespace<T extends Rpc.DurableObjectBranded | undefined = undefined> {
+    newUniqueId(options?: DurableObjectNamespaceNewUniqueIdO
