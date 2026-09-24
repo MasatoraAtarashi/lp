@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--
+      Canonical is a placeholder until the first deploy.
+      Replace it with the workers.dev URL wrangler prints, or your custom domain.
+      See README → Canonical URL.
+    -->
+    <title>Everyday Japan — Daily-life tours in Tokyo for visitors</title>
+    <meta
+      name="description"
+      content="Small-group walks for visitors who want everyday Tokyo: neighborhoods, markets, cafes, and era-flavored daily life — not another temple checklist. Join the waitlist."
+    />
+    <link rel="canonical" href="https://everyday-japan-tour.workers.dev/" />
+    <meta property="og:title" content="Everyday Japan — Daily-life tours in Tokyo for visitors" />
+    <meta
+      property="og:description"
+      content="Small-group walks for visitors who want everyday Tokyo: neighborhoods, markets, cafes, and era-flavored daily life — not another temple checklist."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://everyday-japan-tour.workers.dev/" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="Everyday Japan" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Everyday Japan — Daily-life tours in Tokyo for visitors" />
+    <meta
+      name="twitter:description"
+      content="Neighborhood walks, markets, cafes, and era-flavored daily life in Tokyo. Join the waitlist."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%239a3412'/><text x='50' y='68' text-anchor='middle' font-size='52' fill='%23f7f3eb' font-family='Georgia,serif'>日</text></svg>"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="brand" href="#top">Everyday Japan</a>
+        <nav class="site-nav" aria-label="Page">
+          <a href="#walks">Walks</a>
+          <a href="#who">Who it's for</a>
+          <a class="button button-ghost" href="#waitlist">Join the waitlist</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="container">
+          <p class="badge">Tokyo · Waitlist open</p>
+          <h1>Spend a day in the Japan people actually live.</h1>
+          <p class="lead">
+            Most trips stack temples, anime streets, and the same photo spots. Everyday Japan is a
+            small-group walk for visitors who want the weekday city: how a neighborhood works, what
+            locals eat, and the texture of daily life — including the lived-in streets around Yoyogi
+            Park.
+          </p>
+
+          <form id="waitlist" class="waitlist-form" action="/api/waitlist" method="post">
+            <label class="visually-hidden" for="email">Email address</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              required
+              placeholder="you@example.com"
+              autocomplete="email"
+            />
+            <button class="button button-primary" type="submit">Join the waitlist</button>
+          </form>
+          <p id="form-message" class="form-message" role="status" aria-live="polite"></p>
+          <p class="privacy-note">
+            One email when the first walks open. No drip course. No charge for joining.
+          </p>
+        </div>
+      </section>
+
+      <section class="problem" id="problem">
+        <div class="container">
+          <h2>You came for Japan. The itinerary handed you a checklist.</h2>
+          <div class="feature-grid">
+            <article class="feature-card">
+              <h3>The famous places are easy. The ordinary city is not.</h3>
+              <p>
+                Guidebooks are excellent at shrines, crossings, and themed districts. They are quiet
+                about a Tuesday: where people buy groceries, which cafe is actually used, how a park
+                edge feels when nobody is performing for a camera.
+              </p>
+            </article>
+            <article class="feature-card">
+              <h3>"Local" often still means a stop, not a day.</h3>
+              <p>
+                A twenty-minute drop-in does not show you how a neighborhood spends an afternoon.
+                The desire under the search is simpler: to be in the city people live, with enough
+                time to notice it.
+              </p>
+            </article>
+            <article class="feature-card">
+              <h3>You want a person, not a loudspeaker.</h3>
+              <p>
+                English, a small group, and a host who lives here. Room to walk and sit. Not a bus,
+                not a nightlife crawl, and not a lecture in front of a monument.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="walks" id="walks">
+        <div class="container">
+          <h2>Sample walks, by neighborhood, era, and the shape of a day</h2>
+          <p class="section-lead">
+            These modules are the first season we want to test. They are not a fixed catalog, and
+            they are not on sale yet. If this waitlist is real, these are the walks we open first.
+          </p>
+          <div class="feature-grid">
+            <article class="feature-card">
+              <p class="module-kicker">Neighborhood</p>
+              <h3>Yoyogi, on a weekday</h3>
+              <p>
+                The park is the landmark. The walk is a normal day around it: the lived-in edge of
+                Yoyogi Park, a neighborhood street, a market or grocery stop, a cafe people actually
+                use, and time with someone who lives nearby. Harajuku can sit in the background. It
+                is not the point.
+              </p>
+            </article>
+            <article class="feature-card">
+              <p class="module-kicker">Era</p>
+              <h3>One era, ordinary hours</h3>
+              <p>
+                A module flavored by a single period's daily routine — meals, shops, and the way a
+                street still carries that rhythm. The era can change by departure. You are not
+                collecting a shrine stamp or sitting through a museum talk. You are tracing how
+                ordinary life felt, and what of it is still on the street.
+              </p>
+            </article>
+            <article class="feature-card">
+              <p class="module-kicker">A full afternoon</p>
+              <h3>Markets, back streets, and dusk</h3>
+              <p>
+                Follow one neighborhood from an errand to evening. Where people buy food. What lunch
+                looks like when nobody is visiting. How the block changes when the day ends. Built
+                for travelers who would rather walk than queue.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="audience" id="who">
+        <div class="container split">
+          <div>
+            <h2>Who it's for</h2>
+            <ul class="plain-list">
+              <li>First-time or returning visitors who are done collecting famous photo spots</li>
+              <li>
+                People who like to walk, sit in a small cafe, and talk with a local in English
+              </li>
+              <li>
+                Travelers who want everyday life — including era-flavored routines — more than a
+                theme-park version of Japan
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h2>Who should skip it</h2>
+            <ul class="plain-list">
+              <li>A packed highlights bus</li>
+              <li>A nightlife crawl</li>
+              <li>A photography sprint through Shibuya Crossing</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="trust" id="trust">
+        <div class="container">
+          <h2>This page is a demand test, not a ticket window.</h2>
+          <p class="section-lead">
+            We are checking whether overseas visitors want this before we invent dates, prices, or a
+            polished guide roster. Joining the list does not charge you and does not book a seat.
+          </p>
+          <ul class="trust-list">
+            <li>Guides will be Tokyo residents. Short bios go up when the first dates are real.</li>
+            <li>Groups stay small. The cap is published with the first departures.</li>
+            <li>
+              Price, meeting point, and cancellation terms ship with the first walk — to this list
+              first.
+            </li>
+            <li>The walk is in English. You do not need Japanese to join.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="cta" id="join">
+        <div class="container">
+          <h2>Hear about the first walks before they are public.</h2>
+          <p>
+            One email when a Yoyogi weekday or an era-flavored daily-life walk is ready to book.
+          </p>
+          <a class="button button-primary" href="#waitlist">Join the waitlist</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>Everyday Japan · Inbound daily-life tours in Tokyo. Currently a waitlist.</p>
+      </div>
+    </footer>
+
+    <script src="/main.js" defer></script>
+  </body>
+</html>
