@@ -1,0 +1,242 @@
+epo metadata with initial token.
+     * @throws {ArtifactsError} with code `INVALID_REPO_NAME` if name is invalid.
+     * @throws {ArtifactsError} with code `ALREADY_EXISTS` if the repo already exists.
+     */
+    create(name: string, opts?: {
+        readOnly?: boolean;
+        description?: string;
+        setDefaultBranch?: string;
+    }): Promise<ArtifactsCreateRepoResult>;
+    /**
+     * Get a handle to an existing repository.
+     * @param name Repository name.
+     * @returns Repo handle.
+     * @throws {ArtifactsError} with code `NOT_FOUND` if the repo does not exist.
+     * @throws {ArtifactsError} with code `IMPORT_IN_PROGRESS` if the repo is still importing.
+     * @throws {ArtifactsError} with code `FORK_IN_PROGRESS` if the repo is still forking.
+     */
+    get(name: string): Promise<ArtifactsRepo>;
+    /**
+     * Import a repository from an external git remote.
+     * @param params Source URL and optional branch/depth, plus target name and options.
+     * @returns Repo metadata with initial token.
+     * @throws {ArtifactsError} with code `INVALID_REPO_NAME` if the target name is invalid.
+     * @throws {ArtifactsError} with code `INVALID_INPUT` if the source URL is not valid HTTPS.
+     * @throws {ArtifactsError} with code `INVALID_URL` if the source URL does not point to a git repository.
+     * @throws {ArtifactsError} with code `REMOTE_AUTH_REQUIRED` if the remote requires authentication.
+     * @throws {ArtifactsError} with code `NOT_FOUND` if the remote repository does not exist.
+     * @throws {ArtifactsError} with code `UPSTREAM_UNAVAILABLE` if the remote cannot be reached.
+     * @throws {ArtifactsError} with code `MEMORY_LIMIT` if the import exceeds service memory limits.
+     * @throws {ArtifactsError} with code `ALREADY_EXISTS` if the target repo already exists.
+     */
+    import(params: {
+        source: {
+            url: string;
+            branch?: string;
+            depth?: number;
+        };
+        target: {
+            name: string;
+            opts?: {
+                description?: string;
+                readOnly?: boolean;
+            };
+        };
+    }): Promise<ArtifactsCreateRepoResult>;
+    /**
+     * List repositories with cursor-based pagination.
+     * @param opts Optional: limit (1–200, default 50), cursor for next page.
+     */
+    list(opts?: {
+        limit?: number;
+        cursor?: string;
+    }): Promise<ArtifactsRepoListResult>;
+    /**
+     * Delete a repository and all associated tokens.
+     * @param name Repository name.
+     * @returns true if deleted, false if not found.
+     * @throws {ArtifactsError} with code `INVALID_REPO_NAME` if name is invalid.
+     */
+    delete(name: string): Promise<boolean>;
+}
+/**
+ * @deprecated Use the standalone AI Search Workers binding instead.
+ * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+ */
+interface AutoRAGInternalError extends Error {
+}
+/**
+ * @deprecated Use the standalone AI Search Workers binding instead.
+ * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+ */
+interface AutoRAGNotFoundError extends Error {
+}
+/**
+ * @deprecated Use the standalone AI Search Workers binding instead.
+ * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+ */
+interface AutoRAGUnauthorizedError extends Error {
+}
+/**
+ * @deprecated Use the standalone AI Search Workers binding instead.
+ * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+ */
+interface AutoRAGNameNotSetError extends Error {
+}
+type ComparisonFilter = {
+    key: string;
+    type: 'eq' | 'ne' | 'gt' | 'gte' | 'lt' | 'lte';
+    value: string | number | boolean;
+};
+type CompoundFilter = {
+    type: 'and' | 'or';
+    filters: ComparisonFilter[];
+};
+/**
+ * @deprecated Use the standalone AI Search Workers binding instead.
+ * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+ */
+type AutoRagSearchRequest = {
+    query: string;
+    filters?: CompoundFilter | ComparisonFilter;
+    max_num_results?: number;
+    ranking_options?: {
+        ranker?: string;
+        score_threshold?: number;
+    };
+    reranking?: {
+        enabled?: boolean;
+        model?: string;
+    };
+    rewrite_query?: boolean;
+};
+/**
+ * @deprecated Use the standalone AI Search Workers binding instead.
+ * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+ */
+type AutoRagAiSearchRequest = AutoRagSearchRequest & {
+    stream?: boolean;
+    system_prompt?: string;
+};
+/**
+ * @deprecated Use the standalone AI Search Workers binding instead.
+ * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+ */
+type AutoRagAiSearchRequestStreaming = Omit<AutoRagAiSearchRequest, 'stream'> & {
+    stream: true;
+};
+/**
+ * @deprecated Use the standalone AI Search Workers binding instead.
+ * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+ */
+type AutoRagSearchResponse = {
+    object: 'vector_store.search_results.page';
+    search_query: string;
+    data: {
+        file_id: string;
+        filename: string;
+        score: number;
+        attributes: Record<string, string | number | boolean | null>;
+        content: {
+            type: 'text';
+            text: string;
+        }[];
+    }[];
+    has_more: boolean;
+    next_page: string | null;
+};
+/**
+ * @deprecated Use the standalone AI Search Workers binding instead.
+ * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+ */
+type AutoRagListResponse = {
+    id: string;
+    enable: boolean;
+    type: string;
+    source: string;
+    vectorize_name: string;
+    paused: boolean;
+    status: string;
+}[];
+/**
+ * @deprecated Use the standalone AI Search Workers binding instead.
+ * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+ */
+type AutoRagAiSearchResponse = AutoRagSearchResponse & {
+    response: string;
+};
+/**
+ * @deprecated Use the standalone AI Search Workers binding instead.
+ * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+ */
+declare abstract class AutoRAG {
+    /**
+     * @deprecated Use the standalone AI Search Workers binding instead.
+     * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+     */
+    list(): Promise<AutoRagListResponse>;
+    /**
+     * @deprecated Use the standalone AI Search Workers binding instead.
+     * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+     */
+    search(params: AutoRagSearchRequest): Promise<AutoRagSearchResponse>;
+    /**
+     * @deprecated Use the standalone AI Search Workers binding instead.
+     * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+     */
+    aiSearch(params: AutoRagAiSearchRequestStreaming): Promise<Response>;
+    /**
+     * @deprecated Use the standalone AI Search Workers binding instead.
+     * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+     */
+    aiSearch(params: AutoRagAiSearchRequest): Promise<AutoRagAiSearchResponse>;
+    /**
+     * @deprecated Use the standalone AI Search Workers binding instead.
+     * See https://developers.cloudflare.com/ai-search/usage/workers-binding/
+     */
+    aiSearch(params: AutoRagAiSearchRequest): Promise<AutoRagAiSearchResponse | Response>;
+}
+type BrowserRunLifecycleEvent = 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
+type BrowserRunResourceType = 'document' | 'stylesheet' | 'image' | 'media' | 'font' | 'script' | 'texttrack' | 'xhr' | 'fetch' | 'prefetch' | 'eventsource' | 'websocket' | 'manifest' | 'signedexchange' | 'ping' | 'cspviolationreport' | 'preflight' | 'other';
+/** Options fields shared by all quick actions. */
+interface BrowserRunBaseOptions {
+    /** Adds `<script>` tags into the page with the desired URL or content.
+     * @see https://pptr.dev/api/puppeteer.frameaddscripttagoptions
+     */
+    addScriptTag?: Array<{
+        content?: string;
+        url?: string;
+        type?: string;
+        id?: string;
+    }>;
+    /** Adds `<link rel="stylesheet">` or `<style>` tags into the page.
+     * @see https://pptr.dev/api/puppeteer.frameaddstyletagoptions
+     */
+    addStyleTag?: Array<{
+        content?: string;
+        url?: string;
+    }>;
+    /** Provide credentials for HTTP authentication. @see https://pptr.dev/api/puppeteer.credentials */
+    authenticate?: {
+        username: string;
+        password: string;
+    };
+    /** Set cookies before navigating. @see https://pptr.dev/api/puppeteer.cookieparam */
+    cookies?: Array<{
+        name: string;
+        value: string;
+        url?: string;
+        domain?: string;
+        path?: string;
+        secure?: boolean;
+        httpOnly?: boolean;
+        sameSite?: 'Strict' | 'Lax' | 'None';
+        expires?: number;
+        priority?: 'Low' | 'Medium' | 'High';
+        sameParty?: boolean;
+        sourceScheme?: 'Unset' | 'NonSecure' | 'Secure';
+        sourcePort?: number;
+        partitionKey?: string;
+    }>;
+    /** Emulate a specific CSS media type (e.g. `"screen"`, `"print"`). */
+   
