@@ -76,19 +76,11 @@ https://everyday-japan-tour.workers.dev/
 この環境には Cloudflare の API トークンを置いていません。トークンを用意してから、アプリディレクトリで実行します。
 
 ```bash
-# 初回: D1 を作って database_id を wrangler.jsonc に書き、build + deploy する
-# （app-template 側に squat がある場合は、その CLI から `squat deploy` でも同じ）
+# build + リモートマイグレーション（predeploy）+ wrangler deploy
 pnpm deploy
 ```
 
-`pnpm deploy` の前に、プレースホルダの `database_id`（`00000000-0000-0000-0000-000000000000`）を実 ID に置き換えてください。未ログインなら:
-
-```bash
-npx wrangler login
-npx wrangler d1 create everyday-japan-tour-db
-```
-
-表示された UUID を `wrangler.jsonc` の `database_id` に書き、`pnpm db:migrate:remote` のあと `pnpm deploy` します。
+`wrangler.jsonc` の `database_id` は本番 D1 `everyday-japan-tour-db`（`51a43ff9-266e-47ee-8b77-a06f21642473`）です。スキーマをリモートへ載せるときは `pnpm db:migrate:remote` のあと `pnpm deploy` します。
 
 ### GitHub Actions で自動デプロイする
 
@@ -106,7 +98,7 @@ npx wrangler d1 create everyday-japan-tour-db
 
 4. `main` に push すると `deploy.yml` がデプロイする。PR では `preview.yml` がプレビュー URL をコメントする
 
-D1 の `database_id` がプレースホルダのままではリモートマイグレーションもデプロイも通りません。初回はローカルで `wrangler d1 create` して ID をコミットしてから Actions に任せます。
+D1 の `database_id` は本番 UUID です。GitHub に Cloudflare の secret を登録したあと、`main` への push でリモートマイグレーションとデプロイが走ります。
 
 ## 登録されたメールアドレスの確認
 
