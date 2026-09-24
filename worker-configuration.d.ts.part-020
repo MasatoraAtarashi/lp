@@ -1,0 +1,248 @@
+() method. */
+interface AgentMemoryRecallResult {
+    /** Number of memories retrieved. */
+    count: number;
+    /** LLM-generated answer synthesizing the matching memories. */
+    answer: string;
+    /** Matching memories ranked by relevance. */
+    candidates: AgentMemoryScoredCandidate[];
+}
+/**
+ * Options for the list() method.
+ *
+ * `cursor` is the opaque continuation token returned by the previous page;
+ * pass it back unchanged to fetch the next page. `sessionId` and `type`
+ * are exact-match filters; combining them is allowed.
+ */
+interface AgentMemoryListMemoriesOptions {
+    /** Maximum number of memories to return. Default 20, max 500. */
+    limit?: number;
+    /** Opaque cursor from a previous page. */
+    cursor?: string;
+    /** Exact-match session filter. */
+    sessionId?: string;
+    /** Exact-match memory-type filter. */
+    type?: AgentMemoryMemoryType;
+}
+/** Response from the list() method. */
+interface AgentMemoryListMemoriesResult {
+    memories: AgentMemoryMemoryListEntry[];
+    /** Continuation cursor; absent when this page exhausted the result set. */
+    cursor?: string;
+}
+/**
+ * A single Agent Memory profile, scoped to a profile name.
+ *
+ * Returned by {@link AgentMemoryNamespace.getProfile}.
+ */
+declare abstract class AgentMemoryProfile {
+    /**
+     * Retrieve a memory by ID.
+     *
+     * @param memoryId - ULID of the memory to retrieve.
+     * @throws if the memory does not exist.
+     */
+    get(memoryId: string): Promise<AgentMemoryMemory>;
+    /**
+     * Delete a memory by ID.
+     *
+     * Removes the memory and any source messages linked by the memory's
+     * source message IDs.
+     *
+     * @param memoryId - ULID of the memory to delete.
+     * @throws if the memory does not exist.
+     */
+    delete(memoryId: string): Promise<AgentMemoryMemory>;
+    /**
+     * Store a memory in this profile. The content is automatically classified,
+     * summarized, and indexed.
+     *
+     * @param memory - Raw memory content to persist.
+     */
+    remember(memory: AgentMemoryIncomingMemory): Promise<AgentMemoryMemory>;
+    /**
+     * Extract memories from a conversation.
+     *
+     * @param messages - Conversation messages to extract memories from.
+     * @param options  - Optional ingest options.
+     */
+    ingest(messages: Iterable<AgentMemoryMessage>, options?: AgentMemoryIngestOptions): Promise<void>;
+    /**
+     * Get a profile summary.
+     *
+     * @param options - Optional getSummary options.
+     */
+    getSummary(options?: AgentMemoryGetSummaryOptions): Promise<AgentMemoryGetSummaryResponse>;
+    /**
+     * Recall memories in this profile.
+     *
+     * @param query   - Recall query matched against memory content and keywords.
+     * @param options - Optional recall parameters.
+     * @returns Matching memories with relevance scores and a synthesized answer.
+     */
+    recall(query: string, options?: AgentMemoryRecallOptions): Promise<AgentMemoryRecallResult>;
+    /**
+     * List active memories in this profile.
+     *
+     * Returns a paginated, filterable view of stored memories. Superseded
+     * versions are excluded. Use the returned `cursor` (when present) to
+     * fetch the next page.
+     *
+     * @param options - Optional pagination and filter options.
+     */
+    list(options?: AgentMemoryListMemoriesOptions): Promise<AgentMemoryListMemoriesResult>;
+    /**
+     * Soft-delete every memory and message in this profile that is tagged
+     * with `sessionId`.
+     *
+     * Idempotent: deleting a sessionId that has no rows is a no-op.
+     *
+     * @param sessionId - Session to delete.
+     */
+    deleteSession(sessionId: string): Promise<void>;
+}
+/**
+ * Namespace-level Agent Memory binding.
+ *
+ * Used as the type of an `env.MEMORY`-style binding backed by the Agent
+ * Memory product.
+ *
+ * @example
+ * ```ts
+ * export default {
+ *   async fetch(_request: Request, env: Env): Promise<Response> {
+ *     const profile = await env.MEMORY.getProfile("wrangler-e2e");
+ *     const summary = await profile.getSummary();
+ *     return Response.json(summary);
+ *   },
+ * };
+ * ```
+ */
+declare abstract class AgentMemoryNamespace {
+    /**
+     * Get a memory profile by name. Profiles are isolated by namespace and
+     * addressed by a compound key (namespaceId:profileName).
+     *
+     * @param profileName - Profile name (validated against naming rules).
+     * @returns RPC target for interacting with the profile.
+     */
+    getProfile(profileName: string): Promise<AgentMemoryProfile>;
+    /**
+     * Soft-delete a profile and schedule deferred purge. Marks all
+     * memories and messages as deleted.
+     *
+     * @param profileName - Name of the profile to delete.
+     */
+    deleteProfile(profileName: string): Promise<void>;
+}
+// ============ AI Search Error Interfaces ============
+interface AiSearchInternalError extends Error {
+}
+interface AiSearchNotFoundError extends Error {
+}
+// ============ AI Search Common Types ============
+/** A single message in a conversation-style search or chat request. */
+type AiSearchMessage = {
+    role: 'system' | 'developer' | 'user' | 'assistant' | 'tool';
+    content: string | null;
+};
+/**
+ * Common shape for `ai_search_options` used by both single-instance and multi-instance requests.
+ * Contains retrieval, query rewrite, reranking, and cache sub-options.
+ */
+type AiSearchOptions = {
+    retrieval?: {
+        /** Which retrieval backend to use. Defaults to the instance's configured index_method. */
+        retrieval_type?: 'vector' | 'keyword' | 'hybrid';
+        /** Fusion method for combining vector + keyword results. */
+        fusion_method?: 'max' | 'rrf';
+        /** How keyword terms are combined: "and" = all terms must match, "or" = any term matches. */
+        keyword_match_mode?: 'and' | 'or';
+        /** Minimum similarity score (0-1) for a result to be included. Default 0.4. */
+        match_threshold?: number;
+        /** Maximum number of results to return (1-50). Default 10. */
+        max_num_results?: number;
+        /** Vectorize metadata filters applied to the search. */
+        filters?: VectorizeVectorMetadataFilter;
+        /** Number of surrounding chunks to include for context (0-3). Default 0. */
+        context_expansion?: number;
+        /** If true, return only item metadata without chunk text. */
+        metadata_only?: boolean;
+        /** If true (default), return empty results on retrieval failure instead of throwing. */
+        return_on_failure?: boolean;
+        /** Boost results by metadata field values. Max 3 entries. */
+        boost_by?: Array<{
+            field: string;
+            direction?: 'asc' | 'desc' | 'exists' | 'not_exists';
+        }>;
+        [key: string]: unknown;
+    };
+    query_rewrite?: {
+        enabled?: boolean;
+        model?: string;
+        rewrite_prompt?: string;
+        [key: string]: unknown;
+    };
+    reranking?: {
+        enabled?: boolean;
+        model?: string;
+        /** Match threshold (0-1, default 0.4) */
+        match_threshold?: number;
+        [key: string]: unknown;
+    };
+    cache?: {
+        enabled?: boolean;
+        cache_threshold?: 'super_strict_match' | 'close_enough' | 'flexible_friend' | 'anything_goes';
+    };
+    [key: string]: unknown;
+};
+// ============ AI Search Request Types ============
+/**
+ * Request body for single-instance search.
+ * Exactly one of `query` or `messages` must be provided.
+ */
+type AiSearchSearchRequest = {
+    /** Simple query string. */
+    query: string;
+    messages?: never;
+    ai_search_options?: AiSearchOptions;
+} | {
+    query?: never;
+    /** Conversation-style input. At least one user message with non-empty content is required. */
+    messages: AiSearchMessage[];
+    ai_search_options?: AiSearchOptions;
+};
+type AiSearchChatCompletionsRequest = {
+    messages: AiSearchMessage[];
+    model?: string;
+    stream?: boolean;
+    ai_search_options?: AiSearchOptions;
+    [key: string]: unknown;
+};
+// ============ AI Search Multi-Instance Types (Namespace-Scoped) ============
+/** `ai_search_options` shape for multi-instance requests — requires `instance_ids`. */
+type AiSearchMultiSearchOptions = AiSearchOptions & {
+    /** Instance IDs to search across (1-10). */
+    instance_ids: string[];
+};
+/**
+ * Request for searching across multiple instances within a namespace.
+ * `ai_search_options` is required and must include `instance_ids`.
+ * Exactly one of `query` or `messages` must be provided.
+ */
+type AiSearchMultiSearchRequest = {
+    /** Simple query string. */
+    query: string;
+    messages?: never;
+    ai_search_options: AiSearchMultiSearchOptions;
+} | {
+    query?: never;
+    /** Conversation-style input. */
+    messages: AiSearchMessage[];
+    ai_search_options: AiSearchMultiSearchOptions;
+};
+/** A search result chunk tagged with the instance it originated from. */
+type AiSearchMultiSearchChunk = AiSearchSearchResponse['chunks'][number] & {
+    instance_id: string;
+};
+/** Describes a per-instance error during a multi-instance oper
