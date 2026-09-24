@@ -1,0 +1,185 @@
+9440)
+     * format (`:base64-DER:`). Empty if no client certificate was presented or if
+     * the leaf certificate exceeded 10 KB (see {@link certRFC9440TooLarge}).
+     *
+     * Suitable for forwarding to an origin via the `Client-Cert` HTTP header.
+     */
+    certRFC9440: string;
+    /**
+     * `true` if the leaf certificate exceeded 10 KB and was omitted from
+     * {@link certRFC9440}.
+     */
+    certRFC9440TooLarge: boolean;
+    /**
+     * The intermediate certificate chain in [RFC 9440](https://www.rfc-editor.org/rfc/rfc9440)
+     * format as a comma-separated list. Empty if no intermediates were sent or
+     * if the chain exceeded 16 KB (see {@link certChainRFC9440TooLarge}).
+     *
+     * Suitable for forwarding to an origin via the `Client-Cert-Chain` HTTP header.
+     */
+    certChainRFC9440: string;
+    /**
+     * `true` if the intermediate chain exceeded 16 KB and was omitted from
+     * {@link certChainRFC9440}.
+     */
+    certChainRFC9440TooLarge: boolean;
+}
+/** Placeholder values for TLS Client Authorization */
+interface IncomingRequestCfPropertiesTLSClientAuthPlaceholder {
+    certPresented: "0";
+    certVerified: "NONE";
+    certRevoked: "0";
+    certIssuerDN: "";
+    certSubjectDN: "";
+    certIssuerDNRFC2253: "";
+    certSubjectDNRFC2253: "";
+    certIssuerDNLegacy: "";
+    certSubjectDNLegacy: "";
+    certSerial: "";
+    certIssuerSerial: "";
+    certSKI: "";
+    certIssuerSKI: "";
+    certFingerprintSHA1: "";
+    certFingerprintSHA256: "";
+    certNotBefore: "";
+    certNotAfter: "";
+    certRFC9440: "";
+    certRFC9440TooLarge: false;
+    certChainRFC9440: "";
+    certChainRFC9440TooLarge: false;
+}
+/** Possible outcomes of TLS verification */
+declare type CertVerificationStatus = 
+/** Authentication succeeded */
+"SUCCESS"
+/** No certificate was presented */
+ | "NONE"
+/** Failed because the certificate was self-signed */
+ | "FAILED:self signed certificate"
+/** Failed because the certificate failed a trust chain check */
+ | "FAILED:unable to verify the first certificate"
+/** Failed because the certificate not yet valid */
+ | "FAILED:certificate is not yet valid"
+/** Failed because the certificate is expired */
+ | "FAILED:certificate has expired"
+/** Failed for another unspecified reason */
+ | "FAILED";
+/**
+ * An upstream endpoint's response to a TCP `keepalive` message from Cloudflare.
+ */
+declare type IncomingRequestCfPropertiesEdgeRequestKeepAliveStatus = 0 /** Unknown */ | 1 /** no keepalives (not found) */ | 2 /** no connection re-use, opening keepalive connection failed */ | 3 /** no connection re-use, keepalive accepted and saved */ | 4 /** connection re-use, refused by the origin server (`TCP FIN`) */ | 5; /** connection re-use, accepted by the origin server */
+/** ISO 3166-1 Alpha-2 codes */
+declare type Iso3166Alpha2Code = "AD" | "AE" | "AF" | "AG" | "AI" | "AL" | "AM" | "AO" | "AQ" | "AR" | "AS" | "AT" | "AU" | "AW" | "AX" | "AZ" | "BA" | "BB" | "BD" | "BE" | "BF" | "BG" | "BH" | "BI" | "BJ" | "BL" | "BM" | "BN" | "BO" | "BQ" | "BR" | "BS" | "BT" | "BV" | "BW" | "BY" | "BZ" | "CA" | "CC" | "CD" | "CF" | "CG" | "CH" | "CI" | "CK" | "CL" | "CM" | "CN" | "CO" | "CR" | "CU" | "CV" | "CW" | "CX" | "CY" | "CZ" | "DE" | "DJ" | "DK" | "DM" | "DO" | "DZ" | "EC" | "EE" | "EG" | "EH" | "ER" | "ES" | "ET" | "FI" | "FJ" | "FK" | "FM" | "FO" | "FR" | "GA" | "GB" | "GD" | "GE" | "GF" | "GG" | "GH" | "GI" | "GL" | "GM" | "GN" | "GP" | "GQ" | "GR" | "GS" | "GT" | "GU" | "GW" | "GY" | "HK" | "HM" | "HN" | "HR" | "HT" | "HU" | "ID" | "IE" | "IL" | "IM" | "IN" | "IO" | "IQ" | "IR" | "IS" | "IT" | "JE" | "JM" | "JO" | "JP" | "KE" | "KG" | "KH" | "KI" | "KM" | "KN" | "KP" | "KR" | "KW" | "KY" | "KZ" | "LA" | "LB" | "LC" | "LI" | "LK" | "LR" | "LS" | "LT" | "LU" | "LV" | "LY" | "MA" | "MC" | "MD" | "ME" | "MF" | "MG" | "MH" | "MK" | "ML" | "MM" | "MN" | "MO" | "MP" | "MQ" | "MR" | "MS" | "MT" | "MU" | "MV" | "MW" | "MX" | "MY" | "MZ" | "NA" | "NC" | "NE" | "NF" | "NG" | "NI" | "NL" | "NO" | "NP" | "NR" | "NU" | "NZ" | "OM" | "PA" | "PE" | "PF" | "PG" | "PH" | "PK" | "PL" | "PM" | "PN" | "PR" | "PS" | "PT" | "PW" | "PY" | "QA" | "RE" | "RO" | "RS" | "RU" | "RW" | "SA" | "SB" | "SC" | "SD" | "SE" | "SG" | "SH" | "SI" | "SJ" | "SK" | "SL" | "SM" | "SN" | "SO" | "SR" | "SS" | "ST" | "SV" | "SX" | "SY" | "SZ" | "TC" | "TD" | "TF" | "TG" | "TH" | "TJ" | "TK" | "TL" | "TM" | "TN" | "TO" | "TR" | "TT" | "TV" | "TW" | "TZ" | "UA" | "UG" | "UM" | "US" | "UY" | "UZ" | "VA" | "VC" | "VE" | "VG" | "VI" | "VN" | "VU" | "WF" | "WS" | "YE" | "YT" | "ZA" | "ZM" | "ZW";
+/** The 2-letter continent codes Cloudflare uses */
+declare type ContinentCode = "AF" | "AN" | "AS" | "EU" | "NA" | "OC" | "SA";
+type CfProperties<HostMetadata = unknown> = IncomingRequestCfProperties<HostMetadata> | RequestInitCfProperties;
+interface D1Meta {
+    duration: number;
+    size_after: number;
+    rows_read: number;
+    rows_written: number;
+    last_row_id: number;
+    changed_db: boolean;
+    changes: number;
+    /**
+     * The region of the database instance that executed the query.
+     */
+    served_by_region?: string;
+    /**
+     * The three letters airport code of the colo that executed the query.
+     */
+    served_by_colo?: string;
+    /**
+     * True if-and-only-if the database instance that executed the query was the primary.
+     */
+    served_by_primary?: boolean;
+    timings?: {
+        /**
+         * The duration of the SQL query execution by the database instance. It doesn't include any network time.
+         */
+        sql_duration_ms: number;
+    };
+    /**
+     * Number of total attempts to execute the query, due to automatic retries.
+     * Note: All other fields in the response like `timings` only apply to the last attempt.
+     */
+    total_attempts?: number;
+}
+interface D1Response {
+    success: true;
+    meta: D1Meta & Record<string, unknown>;
+    error?: never;
+}
+type D1Result<T = unknown> = D1Response & {
+    results: T[];
+};
+interface D1ExecResult {
+    count: number;
+    duration: number;
+}
+type D1SessionConstraint = 
+// Indicates that the first query should go to the primary, and the rest queries
+// using the same D1DatabaseSession will go to any replica that is consistent with
+// the bookmark maintained by the session (returned by the first query).
+'first-primary'
+// Indicates that the first query can go anywhere (primary or replica), and the rest queries
+// using the same D1DatabaseSession will go to any replica that is consistent with
+// the bookmark maintained by the session (returned by the first query).
+ | 'first-unconstrained';
+type D1SessionBookmark = string;
+declare abstract class D1Database {
+    prepare(query: string): D1PreparedStatement;
+    batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>;
+    exec(query: string): Promise<D1ExecResult>;
+    /**
+     * Creates a new D1 Session anchored at the given constraint or the bookmark.
+     * All queries executed using the created session will have sequential consistency,
+     * meaning that all writes done through the session will be visible in subsequent reads.
+     *
+     * @param constraintOrBookmark Either the session constraint or the explicit bookmark to anchor the created session.
+     */
+    withSession(constraintOrBookmark?: D1SessionBookmark | D1SessionConstraint): D1DatabaseSession;
+    /**
+     * @deprecated dump() will be removed soon, only applies to deprecated alpha v1 databases.
+     */
+    dump(): Promise<ArrayBuffer>;
+}
+declare abstract class D1DatabaseSession {
+    prepare(query: string): D1PreparedStatement;
+    batch<T = unknown>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]>;
+    /**
+     * @returns The latest session bookmark across all executed queries on the session.
+     *          If no query has been executed yet, `null` is returned.
+     */
+    getBookmark(): D1SessionBookmark | null;
+}
+declare abstract class D1PreparedStatement {
+    bind(...values: unknown[]): D1PreparedStatement;
+    first<T = unknown>(colName: string): Promise<T | null>;
+    first<T = Record<string, unknown>>(): Promise<T | null>;
+    run<T = Record<string, unknown>>(): Promise<D1Result<T>>;
+    all<T = Record<string, unknown>>(): Promise<D1Result<T>>;
+    raw<T = unknown[]>(options: {
+        columnNames: true;
+    }): Promise<[
+        string[],
+        ...T[]
+    ]>;
+    raw<T = unknown[]>(options?: {
+        columnNames?: false;
+    }): Promise<T[]>;
+}
+// `Disposable` was added to TypeScript's standard lib types in version 5.2.
+// To support older TypeScript versions, define an empty `Disposable` interface.
+// Users won't be able to use `using`/`Symbol.dispose` without upgrading to 5.2,
+// but this will ensure type checking on older versions still passes.
+// TypeScript's interface merging will ensure our empty interface is effectively
+// ignored when `Disposable` is included in the standard lib.
+interface Disposable {
+}
+/**
+ * The returned data after sending an email
+ */
+interface EmailSendResult {
+    /**
+     * The Email Messag
