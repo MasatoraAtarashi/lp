@@ -1,0 +1,235 @@
+ts?: string;
+    /** Hierarchical level, e.g. the heading level of an `<h2>`. */
+    level?: number;
+    /** Whether the element is a modal dialog. */
+    modal?: boolean;
+    /** Whether a text input accepts multiple lines. */
+    multiline?: boolean;
+    /** Whether more than one option can be selected. */
+    multiselectable?: boolean;
+    /** Accessible name, e.g. a button's label or an image's alt text. */
+    name?: string;
+    orientation?: string;
+    /** Pressed state of a toggle button. */
+    pressed?: boolean | 'mixed';
+    readonly?: boolean;
+    required?: boolean;
+    /** Author-supplied role description, from `aria-roledescription`. */
+    roledescription?: string;
+    selected?: boolean;
+    /** Current value of an input or range element. */
+    value?: string | number;
+    valuemax?: number;
+    valuemin?: number;
+    /** Human-readable form of `value`, from `aria-valuetext`. */
+    valuetext?: string;
+    /** Child nodes. Absent for leaf nodes. */
+    children?: BrowserRunSerializedAXNode[];
+}
+/** Success response for `content` action. */
+type BrowserRunContentSuccessResponse = {
+    success: true;
+    /** Extracted HTML content */
+    result: string;
+    meta: BrowserRunResponseMeta;
+};
+/** Success response for `links` action. */
+type BrowserRunLinksSuccessResponse = {
+    success: true;
+    /** Extracted links */
+    result: string[];
+};
+/** Success response for `scrape` action. */
+type BrowserRunScrapeSuccessResponse = {
+    success: true;
+    result: Array<{
+        /** The CSS selector used to find elements. */
+        selector: string;
+        /** Array of elements matching the selector. */
+        results: Array<{
+            /** Outer HTML of the element. */
+            html: string;
+            /** Text content of the element. */
+            text: string;
+            /** Width of the element in pixels. */
+            width: number;
+            /** Height of the element in pixels. */
+            height: number;
+            /** Top position of the element relative to the viewport in pixels. */
+            top: number;
+            /** Left position of the element relative to the viewport in pixels. */
+            left: number;
+            /** Array of HTML attributes on the element. */
+            attributes: Array<{
+                /** Attribute name. */
+                name: string;
+                /** Attribute value. */
+                value: string;
+            }>;
+        }>;
+    }>;
+};
+/** Success response for `snapshot` action. Each field is present only when the
+ * corresponding entry was requested in `formats`.
+ */
+type BrowserRunSnapshotSuccessResponse = {
+    success: true;
+    result: {
+        /** HTML content of the page. */
+        content?: string;
+        /** Base64-encoded screenshot image. */
+        screenshot?: string;
+        /** Markdown content. Prefixed with YAML frontmatter (e.g. `title`) when the
+         * page provides that metadata.
+         */
+        markdown?: string;
+        /** Root of the page's accessibility tree. */
+        accessibilityTree?: BrowserRunSerializedAXNode;
+    };
+    meta: BrowserRunResponseMeta;
+};
+/** Success response for `accessibilityTree` action. */
+type BrowserRunAccessibilityTreeSuccessResponse = {
+    success: true;
+    result: {
+        /** Root of the accessibility tree, or `null` when `root` matched no element. */
+        accessibilityTree: BrowserRunSerializedAXNode | null;
+    };
+    meta: BrowserRunResponseMeta;
+};
+/** Success response for `json` action. */
+type BrowserRunJsonSuccessResponse = {
+    success: true;
+    /** JSON data extracted from the page using an AI model */
+    result: Record<string, unknown>;
+};
+/** Success response for `markdown` action. */
+type BrowserRunMarkdownSuccessResponse = {
+    success: true;
+    /** Extracted markdown content */
+    result: string;
+};
+/** Error response for BrowserRun actions. */
+type BrowserRunErrorResponse = {
+    success: false;
+    errors: {
+        message: string;
+        code?: number;
+        detail?: string;
+        path?: string;
+    }[];
+};
+/** Error response for BrowserRun `json` action. */
+type BrowserRunJsonErrorResponse = BrowserRunErrorResponse & {
+    /** Raw AI response text for debugging */
+    rawAiResponse?: string;
+};
+/**
+ * Browser Run API binding for automating headless browsers.
+ * @see https://developers.cloudflare.com/browser-run/
+ */
+declare abstract class BrowserRun {
+    /**
+     * Send a raw HTTP request to the Browser Run API.
+     * Used by libraries like `@cloudflare/puppeteer` to acquire and connect to a browser instance.
+     * @see https://developers.cloudflare.com/browser-run/
+     */
+    fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response>;
+    /**
+     * Take a screenshot of a web page.
+     * @param action - Must be `'screenshot'`.
+     * @param options - Screenshot options including viewport, selectors, and image format.
+     * @returns A `Response` containing one of:
+     *
+     * **Success (HTTP 200):**
+     * - Binary image data with `Content-Type: image/png`, `image/jpeg`, or `image/webp` (when `encoding: 'binary'`, the default)
+     * - Data URI string with `Content-Type: text/plain` (when `encoding: 'base64'`)
+     *
+     * **Error:**
+     * - `BrowserRunErrorResponse` JSON with appropriate HTTP status code (400, 422, 429, 500, 503)
+     *
+     * **Headers:**
+     * - `X-Browser-Ms-Used`: Browser time consumed in milliseconds (set when status < 500)
+     */
+    quickAction(action: 'screenshot', options: BrowserRunScreenshotOptions): Promise<Response>;
+    /**
+     * Generate a PDF of a web page.
+     * @param action - Must be `'pdf'`.
+     * @param options - PDF generation options including page size, margins, and headers/footers.
+     * @returns A `Response` containing one of:
+     *
+     * **Success (HTTP 200):**
+     * - Binary PDF data with `Content-Type: application/pdf`
+     *
+     * **Error:**
+     * - `BrowserRunErrorResponse` JSON with appropriate HTTP status code (400, 422, 429, 500, 503)
+     *
+     * **Headers:**
+     * - `X-Browser-Ms-Used`: Browser time consumed in milliseconds (set when status < 500)
+     */
+    quickAction(action: 'pdf', options: BrowserRunPDFOptions): Promise<Response>;
+    /**
+     * Get the HTML content of a web page.
+     * @param action - Must be `'content'`.
+     * @param options - Navigation and page interaction options.
+     * @returns A `Response` containing one of:
+     *
+     * **Success (HTTP 200):**
+     * - `BrowserRunContentSuccessResponse` JSON with `Content-Type: application/json`
+     *
+     * **Error:**
+     * - `BrowserRunErrorResponse` JSON with appropriate HTTP status code (400, 422, 429, 500, 503)
+     *
+     * **Headers:**
+     * - `X-Browser-Ms-Used`: Browser time consumed in milliseconds (set when status < 500)
+     */
+    quickAction(action: 'content', options: BrowserRunContentOptions): Promise<Response>;
+    /**
+     * Scrape elements from a web page by CSS selector.
+     * @param action - Must be `'scrape'`.
+     * @param options - Scrape options with CSS selectors for elements to extract.
+     * @returns A `Response` containing one of:
+     *
+     * **Success (HTTP 200):**
+     * - `BrowserRunScrapeSuccessResponse` JSON with `Content-Type: application/json`
+     *
+     * **Error:**
+     * - `BrowserRunErrorResponse` JSON with appropriate HTTP status code (400, 422, 429, 500, 503)
+     *
+     * **Headers:**
+     * - `X-Browser-Ms-Used`: Browser time consumed in milliseconds (set when status < 500)
+     */
+    quickAction(action: 'scrape', options: BrowserRunScrapeOptions): Promise<Response>;
+    /**
+     * Extract all links from a web page.
+     * @param action - Must be `'links'`.
+     * @param options - Options to filter visible or internal links only.
+     * @returns A `Response` containing one of:
+     *
+     * **Success (HTTP 200):**
+     * - `BrowserRunLinksSuccessResponse` JSON with `Content-Type: application/json`
+     *
+     * **Error:**
+     * - `BrowserRunErrorResponse` JSON with appropriate HTTP status code (400, 422, 429, 500, 503)
+     *
+     * **Headers:**
+     * - `X-Browser-Ms-Used`: Browser time consumed in milliseconds (set when status < 500)
+     */
+    quickAction(action: 'links', options: BrowserRunLinksOptions): Promise<Response>;
+    /**
+     * Get several representations of a web page in one request.
+     * @param action - Must be `'snapshot'`.
+     * @param options - Snapshot options including the `formats` to return and
+     * screenshot settings (encoding is always base64).
+     * @returns A `Response` containing one of:
+     *
+     * **Success (HTTP 200):**
+     * - `BrowserRunSnapshotSuccessResponse` JSON with `Content-Type: application/json`
+     *
+     * **Error:**
+     * - `BrowserRunErrorResponse` JSON with appropriate HTTP status code (400, 422, 429, 500, 503)
+     *
+     * **Headers:**
+     * - `X-Browser-Ms-Used`: Browser time consumed in milliseconds (set when status < 500)
+     */
+    quickAction(action: 'snapshot', options: 
