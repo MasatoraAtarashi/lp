@@ -17,10 +17,10 @@
     "head_sampling_rate": 1,
   },
   "upload_source_maps": true,
-  // GA4 measurement ID。G-XXXXXXXXXX の間は gtag.js を読み込まない。
-  // 計測 ID は公開値なので vars に置く（secret にしない）。変更手順は README。
+  // GA4 measurement ID（公開値なので vars。secret にしない）。変更手順は README。
+  // 値が G-XXXXXXXXXX または空のあいだはクライアントが gtag.js を読み込まない。
   "vars": {
-    "GA_MEASUREMENT_ID": "G-XXXXXXXXXX",
+    "GA_MEASUREMENT_ID": "G-V2L8K6GDT7",
   },
   "d1_databases": [
     {
