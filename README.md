@@ -27,7 +27,7 @@ http://localhost:8787 で開く。フォームから登録を試すとローカ�
 
 ## Google Analytics の計測 ID
 
-既定値は `G-XXXXXXXXXX` です。この値（または空）のあいだ、ページは gtag.js を読み込みません。
+本番の `vars.GA_MEASUREMENT_ID` は `G-V2L8K6GDT7` です。値が `G-XXXXXXXXXX`（または空）のあいだ、ページは gtag.js を読み込みません。
 
 計測 ID はページの HTML に出る公開値です。secret にはしません。
 
