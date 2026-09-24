@@ -1,0 +1,203 @@
+ it.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/info_static)
+     */
+    info(...data: any[]): void;
+    /**
+     * The **`console.log()`** static method outputs a message to the console.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/log_static)
+     */
+    log(...data: any[]): void;
+    /**
+     * The **`console.table()`** static method displays tabular data as a table.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/table_static)
+     */
+    table(tabularData?: any, properties?: string[]): void;
+    /**
+     * The **`console.time()`** static method starts a timer you can use to track how long an operation takes. You give each timer a unique name, and may have up to 10,000 timers running on a given page. When you call console.timeEnd() with the same name, the browser will output the time, in milliseconds, that elapsed since the timer was started.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/time_static)
+     */
+    time(label?: string): void;
+    /**
+     * The **`console.timeEnd()`** static method stops a timer that was previously started by calling console.time().
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeEnd_static)
+     */
+    timeEnd(label?: string): void;
+    /**
+     * The **`console.timeLog()`** static method logs the current value of a timer that was previously started by calling console.time().
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/timeLog_static)
+     */
+    timeLog(label?: string, ...data: any[]): void;
+    /* The **`console.timeStamp()`** static method adds a single marker to the browser's Performance tool (Firefox bug 1387528, Chrome). This lets you correlate a point in your code with the other events recorded in the timeline, such as layout and paint events. */
+    timeStamp(label?: string): void;
+    /**
+     * The **`console.trace()`** static method outputs a stack trace to the console.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/trace_static)
+     */
+    trace(...data: any[]): void;
+    /**
+     * The **`console.warn()`** static method outputs a warning message to the console at the "warning" log level. The message is only displayed to the user if the console is configured to display warning output. In most cases, the log level is configured within the console UI. The message may receive special formatting, such as yellow colors and a warning icon.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/console/warn_static)
+     */
+    warn(...data: any[]): void;
+}
+declare const console: Console;
+type BufferSource = ArrayBufferView | ArrayBuffer;
+type TypedArray = Int8Array | Uint8Array | Uint8ClampedArray | Int16Array | Uint16Array | Int32Array | Uint32Array | Float32Array | Float64Array | BigInt64Array | BigUint64Array;
+declare namespace WebAssembly {
+    class CompileError extends Error {
+        constructor(message?: string);
+    }
+    class RuntimeError extends Error {
+        constructor(message?: string);
+    }
+    type ValueType = "anyfunc" | "externref" | "f32" | "f64" | "i32" | "i64" | "v128";
+    interface GlobalDescriptor {
+        value: ValueType;
+        mutable?: boolean;
+    }
+    class Global {
+        constructor(descriptor: GlobalDescriptor, value?: any);
+        value: any;
+        valueOf(): any;
+    }
+    type ImportValue = ExportValue | number;
+    type ModuleImports = Record<string, ImportValue>;
+    type Imports = Record<string, ModuleImports>;
+    type ExportValue = Function | Global | Memory | Table;
+    type Exports = Record<string, ExportValue>;
+    class Instance {
+        constructor(module: Module, imports?: Imports);
+        readonly exports: Exports;
+    }
+    interface MemoryDescriptor {
+        initial: number;
+        maximum?: number;
+        shared?: boolean;
+    }
+    class Memory {
+        constructor(descriptor: MemoryDescriptor);
+        readonly buffer: ArrayBuffer;
+        grow(delta: number): number;
+    }
+    type ImportExportKind = "function" | "global" | "memory" | "table";
+    interface ModuleExportDescriptor {
+        kind: ImportExportKind;
+        name: string;
+    }
+    interface ModuleImportDescriptor {
+        kind: ImportExportKind;
+        module: string;
+        name: string;
+    }
+    abstract class Module {
+        static customSections(module: Module, sectionName: string): ArrayBuffer[];
+        static exports(module: Module): ModuleExportDescriptor[];
+        static imports(module: Module): ModuleImportDescriptor[];
+    }
+    type TableKind = "anyfunc" | "externref";
+    interface TableDescriptor {
+        element: TableKind;
+        initial: number;
+        maximum?: number;
+    }
+    class Table {
+        constructor(descriptor: TableDescriptor, value?: any);
+        readonly length: number;
+        get(index: number): any;
+        grow(delta: number, value?: any): number;
+        set(index: number, value?: any): void;
+    }
+    function instantiate(module: Module, imports?: Imports): Promise<Instance>;
+    function validate(bytes: BufferSource): boolean;
+}
+/**
+ * The **`ServiceWorkerGlobalScope`** interface of the Service Worker API represents the global execution context of a service worker.
+ * Available only in secure contexts.
+ *
+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ServiceWorkerGlobalScope)
+ */
+interface ServiceWorkerGlobalScope extends WorkerGlobalScope {
+    DOMException: typeof DOMException;
+    WorkerGlobalScope: typeof WorkerGlobalScope;
+    btoa(data: string): string;
+    atob(data: string): string;
+    setTimeout(callback: (...args: any[]) => void, msDelay?: number): number;
+    setTimeout<Args extends any[]>(callback: (...args: Args) => void, msDelay?: number, ...args: Args): number;
+    clearTimeout(timeoutId: number | null): void;
+    setInterval(callback: (...args: any[]) => void, msDelay?: number): number;
+    setInterval<Args extends any[]>(callback: (...args: Args) => void, msDelay?: number, ...args: Args): number;
+    clearInterval(timeoutId: number | null): void;
+    queueMicrotask(task: Function): void;
+    structuredClone<T>(value: T, options?: StructuredSerializeOptions): T;
+    reportError(error: any): void;
+    fetch(input: RequestInfo | URL, init?: RequestInit<RequestInitCfProperties>): Promise<Response>;
+    self: ServiceWorkerGlobalScope;
+    crypto: Crypto;
+    caches: CacheStorage;
+    scheduler: Scheduler;
+    performance: Performance;
+    Cloudflare: Cloudflare;
+    readonly origin: string;
+    Event: typeof Event;
+    ExtendableEvent: typeof ExtendableEvent;
+    CustomEvent: typeof CustomEvent;
+    PromiseRejectionEvent: typeof PromiseRejectionEvent;
+    FetchEvent: typeof FetchEvent;
+    TailEvent: typeof TailEvent;
+    TraceEvent: typeof TailEvent;
+    ScheduledEvent: typeof ScheduledEvent;
+    MessageEvent: typeof MessageEvent;
+    CloseEvent: typeof CloseEvent;
+    ReadableStreamDefaultReader: typeof ReadableStreamDefaultReader;
+    ReadableStreamBYOBReader: typeof ReadableStreamBYOBReader;
+    ReadableStream: typeof ReadableStream;
+    WritableStream: typeof WritableStream;
+    WritableStreamDefaultWriter: typeof WritableStreamDefaultWriter;
+    TransformStream: typeof TransformStream;
+    ByteLengthQueuingStrategy: typeof ByteLengthQueuingStrategy;
+    CountQueuingStrategy: typeof CountQueuingStrategy;
+    ErrorEvent: typeof ErrorEvent;
+    MessageChannel: typeof MessageChannel;
+    MessagePort: typeof MessagePort;
+    EventSource: typeof EventSource;
+    ReadableStreamBYOBRequest: typeof ReadableStreamBYOBRequest;
+    ReadableStreamDefaultController: typeof ReadableStreamDefaultController;
+    ReadableByteStreamController: typeof ReadableByteStreamController;
+    WritableStreamDefaultController: typeof WritableStreamDefaultController;
+    TransformStreamDefaultController: typeof TransformStreamDefaultController;
+    CompressionStream: typeof CompressionStream;
+    DecompressionStream: typeof DecompressionStream;
+    TextEncoderStream: typeof TextEncoderStream;
+    TextDecoderStream: typeof TextDecoderStream;
+    Headers: typeof Headers;
+    Body: typeof Body;
+    Request: typeof Request;
+    Response: typeof Response;
+    WebSocket: typeof WebSocket;
+    WebSocketPair: typeof WebSocketPair;
+    WebSocketRequestResponsePair: typeof WebSocketRequestResponsePair;
+    AbortController: typeof AbortController;
+    AbortSignal: typeof AbortSignal;
+    TextDecoder: typeof TextDecoder;
+    TextEncoder: typeof TextEncoder;
+    navigator: Navigator;
+    Navigator: typeof Navigator;
+    URL: typeof URL;
+    URLSearchParams: typeof URLSearchParams;
+    URLPattern: typeof URLPattern;
+    Blob: typeof Blob;
+    File: typeof File;
+    FormData: typeof FormData;
+    Crypto: typeof Crypto;
+    SubtleCrypto: typeof SubtleCrypto;
+    CryptoKey: typeof CryptoKey;
+    CacheStorage: typeof CacheStorage;
+    Cache: typeof Cache
