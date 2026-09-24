@@ -1,0 +1,35 @@
+/**
+ * Wrangler 設定の詳細: https://developers.cloudflare.com/workers/wrangler/configuration/
+ * squat により生成: アプリ名は scaffold 時、D1 database_id は初回の `squat deploy` で置換されます。
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "everyday-japan-tour",
+  "compatibility_date": "2025-10-08",
+  "compatibility_flags": ["nodejs_compat"],
+  "main": "./workers/app.ts",
+  // public/ 以下を Workers Static Assets として配信。アセットに無いパスだけ Worker に届く
+  "assets": {
+    "directory": "./public",
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+  },
+  "upload_source_maps": true,
+  // GA4 measurement ID。G-XXXXXXXXXX の間は gtag.js を読み込まない。
+  // 計測 ID は公開値なので vars に置く（secret にしない）。変更手順は README。
+  "vars": {
+    "GA_MEASUREMENT_ID": "G-XXXXXXXXXX",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "everyday-japan-tour-db",
+      // 初回デプロイ（squat deploy）時の `wrangler d1 create` の結果で置換されます
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations",
+      "migrations_table": "d1_migrations",
+    },
+  ],
+}
