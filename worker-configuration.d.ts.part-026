@@ -1,0 +1,281 @@
+ponse.incomplete";
+};
+type ResponseInput = Array<ResponseInputItem>;
+type ResponseInputContent = ResponseInputText | ResponseInputImage;
+type ResponseInputImage = {
+    detail: "low" | "high" | "auto";
+    type: "input_image";
+    /**
+     * Base64 encoded image
+     */
+    image_url?: string | null;
+};
+type ResponseInputImageContent = {
+    type: "input_image";
+    detail?: "low" | "high" | "auto" | null;
+    /**
+     * Base64 encoded image
+     */
+    image_url?: string | null;
+};
+type ResponseInputItem = EasyInputMessage | ResponseInputItemMessage | ResponseOutputMessage | ResponseFunctionToolCall | ResponseInputItemFunctionCallOutput | ResponseReasoningItem;
+type ResponseInputItemFunctionCallOutput = {
+    call_id: string;
+    output: string | ResponseFunctionCallOutputItemList;
+    type: "function_call_output";
+    id?: string | null;
+    status?: "in_progress" | "completed" | "incomplete" | null;
+};
+type ResponseInputItemMessage = {
+    content: ResponseInputMessageContentList;
+    role: "user" | "system" | "developer";
+    status?: "in_progress" | "completed" | "incomplete";
+    type?: "message";
+};
+type ResponseInputMessageContentList = Array<ResponseInputContent>;
+type ResponseInputMessageItem = {
+    id: string;
+    content: ResponseInputMessageContentList;
+    role: "user" | "system" | "developer";
+    status?: "in_progress" | "completed" | "incomplete";
+    type?: "message";
+};
+type ResponseInputText = {
+    text: string;
+    type: "input_text";
+};
+type ResponseInputTextContent = {
+    text: string;
+    type: "input_text";
+};
+type ResponseItem = ResponseInputMessageItem | ResponseOutputMessage | ResponseFunctionToolCallItem | ResponseFunctionToolCallOutputItem;
+type ResponseOutputItem = ResponseOutputMessage | ResponseFunctionToolCall | ResponseReasoningItem;
+type ResponseOutputItemAddedEvent = {
+    item: ResponseOutputItem;
+    output_index: number;
+    sequence_number: number;
+    type: "response.output_item.added";
+};
+type ResponseOutputItemDoneEvent = {
+    item: ResponseOutputItem;
+    output_index: number;
+    sequence_number: number;
+    type: "response.output_item.done";
+};
+type ResponseOutputMessage = {
+    id: string;
+    content: Array<ResponseOutputText | ResponseOutputRefusal>;
+    role: "assistant";
+    status: "in_progress" | "completed" | "incomplete";
+    type: "message";
+};
+type ResponseOutputRefusal = {
+    refusal: string;
+    type: "refusal";
+};
+type ResponseOutputText = {
+    text: string;
+    type: "output_text";
+    logprobs?: Array<Logprob>;
+};
+type ResponseReasoningItem = {
+    id: string;
+    summary: Array<ResponseReasoningSummaryItem>;
+    type: "reasoning";
+    content?: Array<ResponseReasoningContentItem>;
+    encrypted_content?: string | null;
+    status?: "in_progress" | "completed" | "incomplete";
+};
+type ResponseReasoningSummaryItem = {
+    text: string;
+    type: "summary_text";
+};
+type ResponseReasoningContentItem = {
+    text: string;
+    type: "reasoning_text";
+};
+type ResponseReasoningTextDeltaEvent = {
+    content_index: number;
+    delta: string;
+    item_id: string;
+    output_index: number;
+    sequence_number: number;
+    type: "response.reasoning_text.delta";
+};
+type ResponseReasoningTextDoneEvent = {
+    content_index: number;
+    item_id: string;
+    output_index: number;
+    sequence_number: number;
+    text: string;
+    type: "response.reasoning_text.done";
+};
+type ResponseRefusalDeltaEvent = {
+    content_index: number;
+    delta: string;
+    item_id: string;
+    output_index: number;
+    sequence_number: number;
+    type: "response.refusal.delta";
+};
+type ResponseRefusalDoneEvent = {
+    content_index: number;
+    item_id: string;
+    output_index: number;
+    refusal: string;
+    sequence_number: number;
+    type: "response.refusal.done";
+};
+type ResponseStatus = "completed" | "failed" | "in_progress" | "cancelled" | "queued" | "incomplete";
+type ResponseStreamEvent = ResponseCompletedEvent | ResponseCreatedEvent | ResponseErrorEvent | ResponseFunctionCallArgumentsDeltaEvent | ResponseFunctionCallArgumentsDoneEvent | ResponseFailedEvent | ResponseIncompleteEvent | ResponseOutputItemAddedEvent | ResponseOutputItemDoneEvent | ResponseReasoningTextDeltaEvent | ResponseReasoningTextDoneEvent | ResponseRefusalDeltaEvent | ResponseRefusalDoneEvent | ResponseTextDeltaEvent | ResponseTextDoneEvent;
+type ResponseCompletedEvent = {
+    response: Response;
+    sequence_number: number;
+    type: "response.completed";
+};
+type ResponseTextConfig = {
+    format?: ResponseFormatTextConfig;
+    verbosity?: "low" | "medium" | "high" | null;
+};
+type ResponseTextDeltaEvent = {
+    content_index: number;
+    delta: string;
+    item_id: string;
+    logprobs: Array<Logprob>;
+    output_index: number;
+    sequence_number: number;
+    type: "response.output_text.delta";
+};
+type ResponseTextDoneEvent = {
+    content_index: number;
+    item_id: string;
+    logprobs: Array<Logprob>;
+    output_index: number;
+    sequence_number: number;
+    text: string;
+    type: "response.output_text.done";
+};
+type Logprob = {
+    token: string;
+    logprob: number;
+    top_logprobs?: Array<TopLogprob>;
+};
+type TopLogprob = {
+    token?: string;
+    logprob?: number;
+};
+type ResponseUsage = {
+    input_tokens: number;
+    output_tokens: number;
+    total_tokens: number;
+};
+type Tool = ResponsesFunctionTool;
+type ToolChoiceFunction = {
+    name: string;
+    type: "function";
+};
+type ToolChoiceOptions = "none";
+type ReasoningEffort = "minimal" | "low" | "medium" | "high" | null;
+type StreamOptions = {
+    include_obfuscation?: boolean;
+};
+/** Marks keys from T that aren't in U as optional never */
+type Without<T, U> = {
+    [P in Exclude<keyof T, keyof U>]?: never;
+};
+/** Either T or U, but not both (mutually exclusive) */
+type XOR<T, U> = (T & Without<U, T>) | (U & Without<T, U>);
+type Ai_Cf_Baai_Bge_Base_En_V1_5_Input = {
+    text: string | string[];
+    /**
+     * The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy.
+     */
+    pooling?: "mean" | "cls";
+} | {
+    /**
+     * Batch of the embeddings requests to run using async-queue
+     */
+    requests: {
+        text: string | string[];
+        /**
+         * The pooling method used in the embedding process. `cls` pooling will generate more accurate embeddings on larger inputs - however, embeddings created with cls pooling are not compatible with embeddings generated with mean pooling. The default pooling method is `mean` in order for this to not be a breaking change, but we highly suggest using the new `cls` pooling for better accuracy.
+         */
+        pooling?: "mean" | "cls";
+    }[];
+};
+type Ai_Cf_Baai_Bge_Base_En_V1_5_Output = {
+    shape?: number[];
+    /**
+     * Embeddings of the requested text values
+     */
+    data?: number[][];
+    /**
+     * The pooling method used in the embedding process.
+     */
+    pooling?: "mean" | "cls";
+} | Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse;
+interface Ai_Cf_Baai_Bge_Base_En_V1_5_AsyncResponse {
+    /**
+     * The async request id that can be used to obtain the results.
+     */
+    request_id?: string;
+}
+declare abstract class Base_Ai_Cf_Baai_Bge_Base_En_V1_5 {
+    inputs: Ai_Cf_Baai_Bge_Base_En_V1_5_Input;
+    postProcessedOutputs: Ai_Cf_Baai_Bge_Base_En_V1_5_Output;
+}
+type Ai_Cf_Openai_Whisper_Input = string | {
+    /**
+     * An array of integers that represent the audio data constrained to 8-bit unsigned integer values
+     */
+    audio: number[];
+};
+interface Ai_Cf_Openai_Whisper_Output {
+    /**
+     * The transcription
+     */
+    text: string;
+    word_count?: number;
+    words?: {
+        word?: string;
+        /**
+         * The second this word begins in the recording
+         */
+        start?: number;
+        /**
+         * The ending second when the word completes
+         */
+        end?: number;
+    }[];
+    vtt?: string;
+}
+declare abstract class Base_Ai_Cf_Openai_Whisper {
+    inputs: Ai_Cf_Openai_Whisper_Input;
+    postProcessedOutputs: Ai_Cf_Openai_Whisper_Output;
+}
+type Ai_Cf_Meta_M2M100_1_2B_Input = {
+    /**
+     * The text to be translated
+     */
+    text: string;
+    /**
+     * The language code of the source text (e.g., 'en' for English). Defaults to 'en' if not specified
+     */
+    source_lang?: string;
+    /**
+     * The language code to translate the text into (e.g., 'es' for Spanish)
+     */
+    target_lang: string;
+} | {
+    /**
+     * Batch of the embeddings requests to run using async-queue
+     */
+    requests: {
+        /**
+         * The text to be translated
+         */
+        text: string;
+        /**
+         * The language code of the source text (e.g., 'en' for English). Defaults to 'en' if not specified
+         */
+        source_lang?: 
