@@ -1,0 +1,164 @@
+rty of the WritableStreamDefaultWriter interface returns a Promise that resolves when the desired size of the stream's internal queue transitions from non-positive to positive, signaling that it is no longer applying backpressure.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/ready)
+     */
+    get ready(): Promise<void>;
+    /**
+     * The **`desiredSize`** read-only property of the WritableStreamDefaultWriter interface returns the desired size required to fill the stream's internal queue.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/desiredSize)
+     */
+    get desiredSize(): number | null;
+    /**
+     * The **`abort()`** method of the WritableStreamDefaultWriter interface aborts the stream, signaling that the producer can no longer successfully write to the stream and it is to be immediately moved to an error state, with any queued writes discarded.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/abort)
+     */
+    abort(reason?: any): Promise<void>;
+    /**
+     * The **`close()`** method of the WritableStreamDefaultWriter interface closes the associated writable stream.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/close)
+     */
+    close(): Promise<void>;
+    /**
+     * The **`write()`** method of the WritableStreamDefaultWriter interface writes a passed chunk of data to a WritableStream and its underlying sink, then returns a Promise that resolves to indicate the success or failure of the write operation.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/write)
+     */
+    write(chunk?: W): Promise<void>;
+    /**
+     * The **`releaseLock()`** method of the WritableStreamDefaultWriter interface releases the writer's lock on the corresponding stream. After the lock is released, the writer is no longer active. If the associated stream is errored when the lock is released, the writer will appear errored in the same way from now on; otherwise, the writer will appear closed.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/WritableStreamDefaultWriter/releaseLock)
+     */
+    releaseLock(): void;
+}
+/**
+ * The **`TransformStream`** interface of the Streams API represents a concrete implementation of the pipe chain transform stream concept.
+ *
+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStream)
+ */
+declare class TransformStream<I = any, O = any> {
+    constructor(transformer?: Transformer<I, O>, writableStrategy?: QueuingStrategy<I>, readableStrategy?: QueuingStrategy<O>);
+    /**
+     * The **`readable`** read-only property of the TransformStream interface returns the ReadableStream instance controlled by this TransformStream. This stream emits the transformed output data.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStream/readable)
+     */
+    get readable(): ReadableStream<O>;
+    /**
+     * The **`writable`** read-only property of the TransformStream interface returns the WritableStream instance controlled by this TransformStream. This stream accepts input data that will be transformed and emitted to the readable stream.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TransformStream/writable)
+     */
+    get writable(): WritableStream<I>;
+}
+declare class FixedLengthStream extends IdentityTransformStream {
+    constructor(expectedLength: number | bigint, queuingStrategy?: IdentityTransformStreamQueuingStrategy);
+}
+declare class IdentityTransformStream extends TransformStream<ArrayBuffer | ArrayBufferView, Uint8Array> {
+    constructor(queuingStrategy?: IdentityTransformStreamQueuingStrategy);
+}
+interface IdentityTransformStreamQueuingStrategy {
+    highWaterMark?: (number | bigint);
+}
+interface ReadableStreamValuesOptions {
+    preventCancel?: boolean;
+}
+/**
+ * The **`CompressionStream`** interface of the Compression Streams API compresses a stream of data. It implements the same shape as a TransformStream, allowing it to be used in ReadableStream.pipeThrough() and similar methods.
+ *
+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CompressionStream)
+ */
+declare class CompressionStream extends TransformStream<ArrayBuffer | ArrayBufferView, Uint8Array> {
+    constructor(format: "gzip" | "deflate" | "deflate-raw");
+}
+/**
+ * The **`DecompressionStream`** interface of the Compression Streams API decompresses a stream of data. It implements the same shape as a TransformStream, allowing it to be used in ReadableStream.pipeThrough() and similar methods.
+ *
+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/DecompressionStream)
+ */
+declare class DecompressionStream extends TransformStream<ArrayBuffer | ArrayBufferView, Uint8Array> {
+    constructor(format: "gzip" | "deflate" | "deflate-raw");
+}
+/**
+ * The **`TextEncoderStream`** interface of the Encoding API converts a stream of strings into bytes in the UTF-8 encoding. It is the streaming equivalent of TextEncoder. It implements the same shape as a TransformStream, allowing it to be used in ReadableStream.pipeThrough() and similar methods.
+ *
+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextEncoderStream)
+ */
+declare class TextEncoderStream extends TransformStream<string, Uint8Array> {
+    constructor();
+    get encoding(): string;
+}
+/**
+ * The **`TextDecoderStream`** interface of the Encoding API converts a stream of text in a binary encoding, such as UTF-8 etc., to a stream of strings. It is the streaming equivalent of TextDecoder. It implements the same shape as a TransformStream, allowing it to be used in ReadableStream.pipeThrough() and similar methods.
+ *
+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/TextDecoderStream)
+ */
+declare class TextDecoderStream extends TransformStream<ArrayBuffer | ArrayBufferView, string> {
+    constructor(label?: string, options?: TextDecoderStreamTextDecoderStreamInit);
+    get encoding(): string;
+    get fatal(): boolean;
+    get ignoreBOM(): boolean;
+}
+interface TextDecoderStreamTextDecoderStreamInit {
+    fatal?: boolean;
+    ignoreBOM?: boolean;
+}
+/**
+ * The **`ByteLengthQueuingStrategy`** interface of the Streams API provides a built-in byte length queuing strategy that can be used when constructing streams.
+ *
+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ByteLengthQueuingStrategy)
+ */
+declare class ByteLengthQueuingStrategy implements QueuingStrategy<ArrayBufferView> {
+    constructor(init: QueuingStrategyInit);
+    /**
+     * The read-only **`ByteLengthQueuingStrategy.highWaterMark`** property returns the total number of bytes that can be contained in the internal queue before backpressure is applied.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ByteLengthQueuingStrategy/highWaterMark)
+     */
+    get highWaterMark(): number;
+    /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/ByteLengthQueuingStrategy/size) */
+    get size(): (chunk?: any) => number;
+}
+/**
+ * The **`CountQueuingStrategy`** interface of the Streams API provides a built-in chunk counting queuing strategy that can be used when constructing streams.
+ *
+ * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CountQueuingStrategy)
+ */
+declare class CountQueuingStrategy implements QueuingStrategy {
+    constructor(init: QueuingStrategyInit);
+    /**
+     * The read-only **`CountQueuingStrategy.highWaterMark`** property returns the total number of chunks that can be contained in the internal queue before backpressure is applied.
+     *
+     * [MDN Reference](https://developer.mozilla.org/docs/Web/API/CountQueuingStrategy/highWaterMark)
+     */
+    get highWaterMark(): number;
+    /* [MDN Reference](https://developer.mozilla.org/docs/Web/API/CountQueuingStrategy/size) */
+    get size(): (chunk?: any) => number;
+}
+interface QueuingStrategyInit {
+    /**
+     * Creates a new ByteLengthQueuingStrategy with the provided high water mark.
+     *
+     * Note that the provided high water mark will not be validated ahead of time. Instead, if it is negative, NaN, or not a number, the resulting ByteLengthQueuingStrategy will cause the corresponding stream constructor to throw.
+     */
+    highWaterMark: number;
+}
+interface TracePreviewInfo {
+    id: string;
+    slug: string;
+    name: string;
+}
+interface ScriptVersion {
+    id?: string;
+    tag?: string;
+    message?: string;
+}
+declare abstract class TailEvent extends ExtendableEvent {
+    readonly events: TraceItem[];
+    readonly traces: TraceItem[];
+}
+interface TraceItem {
+    readonly event: (TraceItemFetchEventInfo | TraceItemJsRpcEventInfo | TraceItemConnectEventInfo | TraceItemScheduledEventInfo | TraceItemAlarmEventInfo | TraceItemQueueEventInfo | TraceItemEmailEventInfo | TraceItemTailEventInfo | TraceItemCustomEventInfo | TraceItemHi
