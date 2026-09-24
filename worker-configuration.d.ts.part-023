@@ -1,0 +1,285 @@
+ce. */
+    info(): Promise<AiSearchInstanceInfo>;
+    /**
+     * Get instance statistics (item count, indexing status, etc.).
+     * @returns Statistics with counts per status, last activity time, and engine details.
+     */
+    stats(): Promise<AiSearchStatsResponse>;
+    /** Items collection — list, upload, and manage items in this instance. */
+    get items(): AiSearchItems;
+    /** Jobs collection — list, create, and inspect indexing jobs. */
+    get jobs(): AiSearchJobs;
+}
+/**
+ * Namespace-level AI Search service.
+ *
+ * Used as the type of `env.AI_SEARCH` (namespace binding via `ai_search_namespaces`).
+ * Scoped to a single namespace. Provides dynamic instance access, creation, deletion,
+ * and multi-instance search/chat operations.
+ *
+ * @example
+ * ```ts
+ * // Access an instance within the namespace
+ * const blog = env.AI_SEARCH.get("blog");
+ * const results = await blog.search({ query: "How does caching work?" });
+ *
+ * // List all instances in the namespace
+ * const instances = await env.AI_SEARCH.list();
+ *
+ * // Create a new instance with built-in storage
+ * const tenant = await env.AI_SEARCH.create({ id: "tenant-123" });
+ *
+ * // Upload items into the instance
+ * await tenant.items.upload("doc.pdf", fileContent);
+ *
+ * // Search across multiple instances
+ * const multi = await env.AI_SEARCH.search({
+ *   query: "caching",
+ *   ai_search_options: { instance_ids: ["blog", "docs"] },
+ * });
+ *
+ * // Delete an instance
+ * await env.AI_SEARCH.delete("tenant-123");
+ * ```
+ */
+declare abstract class AiSearchNamespace {
+    /**
+     * Get an instance by name within the bound namespace.
+     * @param name Instance name.
+     * @returns Instance service for search, chat, update, stats, items, and jobs.
+     */
+    get(name: string): AiSearchInstance;
+    /**
+     * List instances in the bound namespace.
+     * @param params Optional pagination, search, and ordering parameters.
+     * @returns Array of instance metadata with pagination info.
+     */
+    list(params?: AiSearchListInstancesParams): Promise<AiSearchListResponse>;
+    /**
+     * Create a new instance within the bound namespace.
+     * @param config Instance configuration. Only `id` is required — omit `type` and `source` to create with built-in storage.
+     * @returns Instance service for the newly created instance.
+     *
+     * @example
+     * ```ts
+     * // Create with built-in storage (upload items manually)
+     * const instance = await env.AI_SEARCH.create({ id: "my-search" });
+     *
+     * // Create with web crawler source
+     * const instance = await env.AI_SEARCH.create({
+     *   id: "docs-search",
+     *   type: "web-crawler",
+     *   source: "https://developers.cloudflare.com",
+     * });
+     * ```
+     */
+    create(config: AiSearchConfig): Promise<AiSearchInstance>;
+    /**
+     * Delete an instance from the bound namespace.
+     * @param name Instance name to delete.
+     */
+    delete(name: string): Promise<void>;
+    /**
+     * Search across multiple instances within the bound namespace.
+     * Fans out to the specified instance_ids and merges results.
+     * @param params Search request with required `ai_search_options.instance_ids`.
+     * @returns Search response with chunks tagged by instance_id and optional partial-failure errors.
+     */
+    search(params: AiSearchMultiSearchRequest): Promise<AiSearchMultiSearchResponse>;
+    /**
+     * Generate chat completions across multiple instances within the bound namespace (streaming).
+     * Fans out to the specified instance_ids, merges context, and generates a response.
+     * @param params Chat completions request with stream: true and required `ai_search_options.instance_ids`.
+     * @returns ReadableStream of server-sent events.
+     */
+    chatCompletions(params: AiSearchMultiChatCompletionsRequest & {
+        stream: true;
+    }): Promise<ReadableStream>;
+    /**
+     * Generate chat completions across multiple instances within the bound namespace.
+     * Fans out to the specified instance_ids, merges context, and generates a response.
+     * @param params Chat completions request with required `ai_search_options.instance_ids`.
+     * @returns Chat completion response with choices, chunks tagged by instance_id, and optional partial-failure errors.
+     */
+    chatCompletions(params: AiSearchMultiChatCompletionsRequest): Promise<AiSearchMultiChatCompletionsResponse>;
+}
+type AiImageClassificationInput = {
+    image: number[];
+};
+type AiImageClassificationOutput = {
+    score?: number;
+    label?: string;
+}[];
+declare abstract class BaseAiImageClassification {
+    inputs: AiImageClassificationInput;
+    postProcessedOutputs: AiImageClassificationOutput;
+}
+type AiImageToTextInput = {
+    image: number[];
+    prompt?: string;
+    max_tokens?: number;
+    temperature?: number;
+    top_p?: number;
+    top_k?: number;
+    seed?: number;
+    repetition_penalty?: number;
+    frequency_penalty?: number;
+    presence_penalty?: number;
+    raw?: boolean;
+    messages?: RoleScopedChatInput[];
+};
+type AiImageToTextOutput = {
+    description: string;
+};
+declare abstract class BaseAiImageToText {
+    inputs: AiImageToTextInput;
+    postProcessedOutputs: AiImageToTextOutput;
+}
+type AiImageTextToTextInput = {
+    image: string;
+    prompt?: string;
+    max_tokens?: number;
+    temperature?: number;
+    ignore_eos?: boolean;
+    top_p?: number;
+    top_k?: number;
+    seed?: number;
+    repetition_penalty?: number;
+    frequency_penalty?: number;
+    presence_penalty?: number;
+    raw?: boolean;
+    messages?: RoleScopedChatInput[];
+};
+type AiImageTextToTextOutput = {
+    description: string;
+};
+declare abstract class BaseAiImageTextToText {
+    inputs: AiImageTextToTextInput;
+    postProcessedOutputs: AiImageTextToTextOutput;
+}
+type AiMultimodalEmbeddingsInput = {
+    image: string;
+    text: string[];
+};
+type AiIMultimodalEmbeddingsOutput = {
+    data: number[][];
+    shape: number[];
+};
+declare abstract class BaseAiMultimodalEmbeddings {
+    inputs: AiImageTextToTextInput;
+    postProcessedOutputs: AiImageTextToTextOutput;
+}
+type AiObjectDetectionInput = {
+    image: number[];
+};
+type AiObjectDetectionOutput = {
+    score?: number;
+    label?: string;
+}[];
+declare abstract class BaseAiObjectDetection {
+    inputs: AiObjectDetectionInput;
+    postProcessedOutputs: AiObjectDetectionOutput;
+}
+type AiSentenceSimilarityInput = {
+    source: string;
+    sentences: string[];
+};
+type AiSentenceSimilarityOutput = number[];
+declare abstract class BaseAiSentenceSimilarity {
+    inputs: AiSentenceSimilarityInput;
+    postProcessedOutputs: AiSentenceSimilarityOutput;
+}
+type AiAutomaticSpeechRecognitionInput = {
+    audio: number[];
+};
+type AiAutomaticSpeechRecognitionOutput = {
+    text?: string;
+    words?: {
+        word: string;
+        start: number;
+        end: number;
+    }[];
+    vtt?: string;
+};
+declare abstract class BaseAiAutomaticSpeechRecognition {
+    inputs: AiAutomaticSpeechRecognitionInput;
+    postProcessedOutputs: AiAutomaticSpeechRecognitionOutput;
+}
+type AiSummarizationInput = {
+    input_text: string;
+    max_length?: number;
+};
+type AiSummarizationOutput = {
+    summary: string;
+};
+declare abstract class BaseAiSummarization {
+    inputs: AiSummarizationInput;
+    postProcessedOutputs: AiSummarizationOutput;
+}
+type AiTextClassificationInput = {
+    text: string;
+};
+type AiTextClassificationOutput = {
+    score?: number;
+    label?: string;
+}[];
+declare abstract class BaseAiTextClassification {
+    inputs: AiTextClassificationInput;
+    postProcessedOutputs: AiTextClassificationOutput;
+}
+type AiTextEmbeddingsInput = {
+    text: string | string[];
+};
+type AiTextEmbeddingsOutput = {
+    shape: number[];
+    data: number[][];
+};
+declare abstract class BaseAiTextEmbeddings {
+    inputs: AiTextEmbeddingsInput;
+    postProcessedOutputs: AiTextEmbeddingsOutput;
+}
+type RoleScopedChatInput = {
+    role: "user" | "assistant" | "system" | "tool" | (string & NonNullable<unknown>);
+    content: string;
+    name?: string;
+};
+type AiTextGenerationToolLegacyInput = {
+    name: string;
+    description: string;
+    parameters?: {
+        type: "object" | (string & NonNullable<unknown>);
+        properties: {
+            [key: string]: {
+                type: string;
+                description?: string;
+            };
+        };
+        required: string[];
+    };
+};
+type AiTextGenerationToolInput = {
+    type: "function" | (string & NonNullable<unknown>);
+    function: {
+        name: string;
+        description: string;
+        parameters?: {
+            type: "object" | (string & NonNullable<unknown>);
+            properties: {
+                [key: string]: {
+                    type: string;
+                    description?: string;
+                };
+            };
+            required: string[];
+        };
+    };
+};
+type AiTextGenerationFunctionsInput = {
+    name: string;
+    code: string;
+};
+type AiTextGenerationResponseFormat = {
+    type: string;
+    json_schema?: any;
+};
+type AiTextGenerationInput 
