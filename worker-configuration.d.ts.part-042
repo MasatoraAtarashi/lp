@@ -1,0 +1,235 @@
+gram Model Improvement Program. Refer to Deepgram Docs for pricing impacts before setting this to true. https://dpgr.am/deepgram-mip
+     */
+    mip_opt_out?: "true" | "false";
+    /**
+     * Label your requests for the purpose of identification during usage reporting
+     */
+    tag?: string;
+}
+/**
+ * Output will be returned as websocket messages.
+ */
+interface Ai_Cf_Deepgram_Flux_Output {
+    /**
+     * The unique identifier of the request (uuid)
+     */
+    request_id?: string;
+    /**
+     * Starts at 0 and increments for each message the server sends to the client.
+     */
+    sequence_id?: number;
+    /**
+     * The type of event being reported.
+     */
+    event?: "Update" | "StartOfTurn" | "EagerEndOfTurn" | "TurnResumed" | "EndOfTurn";
+    /**
+     * The index of the current turn
+     */
+    turn_index?: number;
+    /**
+     * Start time in seconds of the audio range that was transcribed
+     */
+    audio_window_start?: number;
+    /**
+     * End time in seconds of the audio range that was transcribed
+     */
+    audio_window_end?: number;
+    /**
+     * Text that was said over the course of the current turn
+     */
+    transcript?: string;
+    /**
+     * The words in the transcript
+     */
+    words?: {
+        /**
+         * The individual punctuated, properly-cased word from the transcript
+         */
+        word: string;
+        /**
+         * Confidence that this word was transcribed correctly
+         */
+        confidence: number;
+    }[];
+    /**
+     * Confidence that no more speech is coming in this turn
+     */
+    end_of_turn_confidence?: number;
+}
+declare abstract class Base_Ai_Cf_Deepgram_Flux {
+    inputs: Ai_Cf_Deepgram_Flux_Input;
+    postProcessedOutputs: Ai_Cf_Deepgram_Flux_Output;
+}
+interface Ai_Cf_Deepgram_Aura_2_En_Input {
+    /**
+     * Speaker used to produce the audio.
+     */
+    speaker?: "amalthea" | "andromeda" | "apollo" | "arcas" | "aries" | "asteria" | "athena" | "atlas" | "aurora" | "callista" | "cora" | "cordelia" | "delia" | "draco" | "electra" | "harmonia" | "helena" | "hera" | "hermes" | "hyperion" | "iris" | "janus" | "juno" | "jupiter" | "luna" | "mars" | "minerva" | "neptune" | "odysseus" | "ophelia" | "orion" | "orpheus" | "pandora" | "phoebe" | "pluto" | "saturn" | "thalia" | "theia" | "vesta" | "zeus";
+    /**
+     * Encoding of the output audio.
+     */
+    encoding?: "linear16" | "flac" | "mulaw" | "alaw" | "mp3" | "opus" | "aac";
+    /**
+     * Container specifies the file format wrapper for the output audio. The available options depend on the encoding type..
+     */
+    container?: "none" | "wav" | "ogg";
+    /**
+     * The text content to be converted to speech
+     */
+    text: string;
+    /**
+     * Sample Rate specifies the sample rate for the output audio. Based on the encoding, different sample rates are supported. For some encodings, the sample rate is not configurable
+     */
+    sample_rate?: number;
+    /**
+     * The bitrate of the audio in bits per second. Choose from predefined ranges or specific values based on the encoding type.
+     */
+    bit_rate?: number;
+}
+/**
+ * The generated audio in MP3 format
+ */
+type Ai_Cf_Deepgram_Aura_2_En_Output = string;
+declare abstract class Base_Ai_Cf_Deepgram_Aura_2_En {
+    inputs: Ai_Cf_Deepgram_Aura_2_En_Input;
+    postProcessedOutputs: Ai_Cf_Deepgram_Aura_2_En_Output;
+}
+interface Ai_Cf_Deepgram_Aura_2_Es_Input {
+    /**
+     * Speaker used to produce the audio.
+     */
+    speaker?: "sirio" | "nestor" | "carina" | "celeste" | "alvaro" | "diana" | "aquila" | "selena" | "estrella" | "javier";
+    /**
+     * Encoding of the output audio.
+     */
+    encoding?: "linear16" | "flac" | "mulaw" | "alaw" | "mp3" | "opus" | "aac";
+    /**
+     * Container specifies the file format wrapper for the output audio. The available options depend on the encoding type..
+     */
+    container?: "none" | "wav" | "ogg";
+    /**
+     * The text content to be converted to speech
+     */
+    text: string;
+    /**
+     * Sample Rate specifies the sample rate for the output audio. Based on the encoding, different sample rates are supported. For some encodings, the sample rate is not configurable
+     */
+    sample_rate?: number;
+    /**
+     * The bitrate of the audio in bits per second. Choose from predefined ranges or specific values based on the encoding type.
+     */
+    bit_rate?: number;
+}
+/**
+ * The generated audio in MP3 format
+ */
+type Ai_Cf_Deepgram_Aura_2_Es_Output = string;
+declare abstract class Base_Ai_Cf_Deepgram_Aura_2_Es {
+    inputs: Ai_Cf_Deepgram_Aura_2_Es_Input;
+    postProcessedOutputs: Ai_Cf_Deepgram_Aura_2_Es_Output;
+}
+interface Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Input {
+    multipart: {
+        body?: object;
+        contentType?: string;
+    };
+}
+interface Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Output {
+    /**
+     * Generated image as Base64 string.
+     */
+    image?: string;
+}
+declare abstract class Base_Ai_Cf_Black_Forest_Labs_Flux_2_Dev {
+    inputs: Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Input;
+    postProcessedOutputs: Ai_Cf_Black_Forest_Labs_Flux_2_Dev_Output;
+}
+interface Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Input {
+    multipart: {
+        body?: object;
+        contentType?: string;
+    };
+}
+interface Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Output {
+    /**
+     * Generated image as Base64 string.
+     */
+    image?: string;
+}
+declare abstract class Base_Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B {
+    inputs: Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Input;
+    postProcessedOutputs: Ai_Cf_Black_Forest_Labs_Flux_2_Klein_4B_Output;
+}
+interface Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Input {
+    multipart: {
+        body?: object;
+        contentType?: string;
+    };
+}
+interface Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Output {
+    /**
+     * Generated image as Base64 string.
+     */
+    image?: string;
+}
+declare abstract class Base_Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B {
+    inputs: Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Input;
+    postProcessedOutputs: Ai_Cf_Black_Forest_Labs_Flux_2_Klein_9B_Output;
+}
+declare abstract class Base_Ai_Cf_Zai_Org_Glm_4_7_Flash {
+    inputs: ChatCompletionsInput;
+    postProcessedOutputs: ChatCompletionsOutput;
+}
+declare abstract class Base_Ai_Cf_Moonshotai_Kimi_K2_5 {
+    inputs: ChatCompletionsInput;
+    postProcessedOutputs: ChatCompletionsOutput;
+}
+declare abstract class Base_Ai_Cf_Moonshotai_Kimi_K2_6 {
+    inputs: ChatCompletionsInput;
+    postProcessedOutputs: ChatCompletionsOutput;
+}
+declare abstract class Base_Ai_Cf_Nvidia_Nemotron_3_120B_A12B {
+    inputs: ChatCompletionsInput;
+    postProcessedOutputs: ChatCompletionsOutput;
+}
+declare abstract class Base_Ai_Cf_Google_Gemma_4_26B_A4B_IT {
+    inputs: ChatCompletionsInput;
+    postProcessedOutputs: ChatCompletionsOutput;
+}
+interface AiModels {
+    "@cf/huggingface/distilbert-sst-2-int8": BaseAiTextClassification;
+    "@cf/stabilityai/stable-diffusion-xl-base-1.0": BaseAiTextToImage;
+    "@cf/runwayml/stable-diffusion-v1-5-inpainting": BaseAiTextToImage;
+    "@cf/runwayml/stable-diffusion-v1-5-img2img": BaseAiTextToImage;
+    "@cf/lykon/dreamshaper-8-lcm": BaseAiTextToImage;
+    "@cf/bytedance/stable-diffusion-xl-lightning": BaseAiTextToImage;
+    "@cf/myshell-ai/melotts": BaseAiTextToSpeech;
+    "@cf/google/embeddinggemma-300m": BaseAiTextEmbeddings;
+    "@cf/microsoft/resnet-50": BaseAiImageClassification;
+    "@cf/meta/llama-2-7b-chat-int8": BaseAiTextGeneration;
+    "@cf/mistral/mistral-7b-instruct-v0.1": BaseAiTextGeneration;
+    "@cf/meta/llama-2-7b-chat-fp16": BaseAiTextGeneration;
+    "@hf/thebloke/llama-2-13b-chat-awq": BaseAiTextGeneration;
+    "@hf/thebloke/mistral-7b-instruct-v0.1-awq": BaseAiTextGeneration;
+    "@hf/thebloke/zephyr-7b-beta-awq": BaseAiTextGeneration;
+    "@hf/thebloke/openhermes-2.5-mistral-7b-awq": BaseAiTextGeneration;
+    "@hf/thebloke/neural-chat-7b-v3-1-awq": BaseAiTextGeneration;
+    "@hf/thebloke/deepseek-coder-6.7b-base-awq": BaseAiTextGeneration;
+    "@hf/thebloke/deepseek-coder-6.7b-instruct-awq": BaseAiTextGeneration;
+    "@cf/deepseek-ai/deepseek-math-7b-instruct": BaseAiTextGeneration;
+    "@cf/defog/sqlcoder-7b-2": BaseAiTextGeneration;
+    "@cf/openchat/openchat-3.5-0106": BaseAiTextGeneration;
+    "@cf/tiiuae/falcon-7b-instruct": BaseAiTextGeneration;
+    "@cf/thebloke/discolm-german-7b-v1-awq": BaseAiTextGeneration;
+    "@cf/qwen/qwen1.5-0.5b-chat": BaseAiTextGeneration;
+    "@cf/qwen/qwen1.5-7b-chat-awq": BaseAiTextGeneration;
+    "@cf/qwen/qwen1.5-14b-chat-awq": BaseAiTextGeneration;
+    "@cf/tinyllama/tinyllama-1.1b-chat-v1.0": BaseAiTextGeneration;
+    "@cf/microsoft/phi-2": BaseAiTextGeneration;
+    "@cf/qwen/qwen1.5-1.8b-chat": BaseAiTextGeneration;
+    "@cf/mistral/mistral-7b-instruct-v0.2-lora": BaseAiTextGeneration;
+    "@hf/nousresearch/hermes-2-pro-mistral-7b": BaseAiTextGeneration;
+    "@hf/nexusflow/starling-lm-7b-beta": BaseAiTextGeneration;
+    "@hf/google/gemma-7b-it": BaseAiTextGeneration;
+    "@cf/meta-llama/llama-2-7b-chat-hf-lora": BaseAiTextGeneration;
+    "@cf/go
