@@ -1,0 +1,5 @@
+# Google Analytics 4 の計測 ID。計測 ID はページに出る公開値であり、シークレットではない。
+# G-XXXXXXXXXX のまま（または空）だと gtag.js は読み込まれない。
+# ローカルだけで別 ID を試すとき、このファイルを .dev.vars にコピーして上書きする。
+# 本番の値は wrangler.jsonc の vars.GA_MEASUREMENT_ID を書き換えてデプロイする。
+GA_MEASUREMENT_ID=G-XXXXXXXXXX
