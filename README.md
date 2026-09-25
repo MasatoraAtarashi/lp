@@ -1,7 +1,9 @@
 # Everyday Japan
 
-海外の訪問者向けに、「日常の日本」を歩くインバウンド体験ツアーのニーズ検証用ランディングページです。
-寺院やアニメの観光地だけでなく、代々木公園周辺の暮らし、時代の空気が残る日常、商店やカフェを題材にした英語の LP と、メールアドレスのウェイティングリストを置きます。
+海外の訪問者向けに、渋谷の半日を自分で歩くための無料カスタムプランを配る検証用ランディングページです。
+短い質問に答えると、地元の生活者目線のルートをメールします。ガイド付きや予約調整のプレミアムはまだ売らず、静かなウェイトリストだけに置きます。
+
+写真主体の英語 LP（`public/`）と、メールアドレス（任意で質問メモ）のウェイトリスト（D1）です。
 
 squat の `public-lp` テンプレートから生成しています。
 
@@ -104,10 +106,10 @@ D1 の `database_id` は本番 UUID です。GitHub に Cloudflare の secret �
 
 ```bash
 # ローカル
-pnpm wrangler d1 execute DB --local --command "SELECT email, created_at FROM waitlist ORDER BY id DESC LIMIT 100"
+pnpm wrangler d1 execute DB --local --command "SELECT email, note, created_at FROM waitlist ORDER BY id DESC LIMIT 100"
 
 # デプロイ後
-pnpm wrangler d1 execute DB --remote --command "SELECT email, created_at FROM waitlist ORDER BY id DESC LIMIT 100"
+pnpm wrangler d1 execute DB --remote --command "SELECT email, note, created_at FROM waitlist ORDER BY id DESC LIMIT 100"
 ```
 
 ## エージェント向け
