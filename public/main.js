@@ -2,9 +2,7 @@
 // wrangler vars / .dev.vars stay the source of truth. A placeholder never loads gtag.js.
 const GA_MEASUREMENT_ID_PLACEHOLDER = "G-XXXXXXXXXX";
 
-const form = document.getElementById("waitlist");
-const input = document.getElementById("email");
-const message = document.getElementById("form-message");
+const PLAN_FIELDS = ["dates", "pace", "interests", "diet", "party"];
 
 function isRealMeasurementId(id) {
   return (
@@ -45,22 +43,37 @@ async function initAnalytics() {
   loadGoogleAnalytics(measurementId);
 }
 
-form.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const email = input.value.trim();
+function fieldValue(form, name) {
+  const el = form.elements.namedItem(name);
+  if (!el || !("value" in el)) return "";
+  return String(el.value).trim();
+}
 
-  message.textContent = "Joining...";
+function planNote(form) {
+  const lines = ["intent: free-plan"];
+  for (const name of PLAN_FIELDS) {
+    const value = fieldValue(form, name);
+    if (value) lines.push(`${name}: ${value}`);
+  }
+  return lines.join("\n");
+}
+
+async function submitWaitlist(form, message, note, successText) {
+  const email = fieldValue(form, "email");
+  const submit = form.querySelector("[type='submit']");
+  if (submit instanceof HTMLButtonElement) submit.disabled = true;
+  message.textContent = "Sending…";
   message.className = "form-message";
 
   try {
     const res = await fetch("/api/waitlist", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, note }),
     });
 
     if (res.status === 201) {
-      message.textContent = "You're on the list. We'll email you when the first walks open.";
+      message.textContent = successText;
       message.className = "form-message success";
       form.reset();
     } else if (res.status === 200) {
@@ -71,9 +84,40 @@ form.addEventListener("submit", async (event) => {
       message.className = "form-message error";
     }
   } catch {
-    message.textContent = "Couldn't join the list. Check your connection and try again.";
+    message.textContent = "Couldn't send that. Check your connection and try again.";
     message.className = "form-message error";
+  } finally {
+    if (submit instanceof HTMLButtonElement) submit.disabled = false;
   }
-});
+}
+
+const planForm = document.getElementById("plan-form");
+const planMessage = document.getElementById("form-message");
+const premiumForm = document.getElementById("premium-form");
+const premiumMessage = document.getElementById("premium-message");
+
+if (planForm instanceof HTMLFormElement && planMessage) {
+  planForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    void submitWaitlist(
+      planForm,
+      planMessage,
+      planNote(planForm),
+      "Request received. We'll email a half-day walking plan — no payment, no booking.",
+    );
+  });
+}
+
+if (premiumForm instanceof HTMLFormElement && premiumMessage) {
+  premiumForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    void submitWaitlist(
+      premiumForm,
+      premiumMessage,
+      "intent: premium-waitlist",
+      "You're on the premium waitlist. We'll write when coordination opens.",
+    );
+  });
+}
 
 initAnalytics();

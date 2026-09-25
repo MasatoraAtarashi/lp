@@ -1,0 +1,37 @@
+Photo credits (Unsplash License / Pexels License — free commercial use)
+
+01-hero.jpg
+  Unsplash CDN: https://images.unsplash.com/photo-1681269663450-a6840a1bc31a
+  Page: https://unsplash.com/photos/an-empty-street-with-a-white-fence-and-trees-8REDBg52u6g
+  Soft daylight Tokyo street with sakura
+
+02-shop.jpg
+  Unsplash CDN: https://images.unsplash.com/photo-1480796927426-f609979314bd
+  Local wooden shopfront with noren (okonomiyaki/monjayaki), bikes
+
+03-street-walk.jpg
+  Unsplash CDN: https://images.unsplash.com/photo-1590559899731-a382839e5549
+  Local shopping street, bicycle, soft daylight
+
+04-quiet-town.jpg
+  Pexels: https://www.pexels.com/photo/2187604/
+  Direct: https://images.pexels.com/photos/2187604/pexels-photo-2187604.jpeg
+  Quiet traditional street, wooden buildings
+
+05-stone-path.jpg
+  Pexels: https://www.pexels.com/photo/2187605/
+  Direct: https://images.pexels.com/photos/2187605/pexels-photo-2187605.jpeg
+  Stone path between traditional houses
+
+06-evening.jpg
+  Unsplash CDN: https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d
+  Canal with sakura & lanterns (Nakameguro / Meguro River vibe)
+
+07-alley.jpg
+  Unsplash CDN: https://images.unsplash.com/photo-1723127194356-8bfb41aaec4e
+  Page: https://unsplash.com/photos/a-narrow-alleyway-with-a-light-on-at-night--TDSa4oIxLA
+  Narrow Tokyo alley at night
+
+08-lantern-shop.jpg
+  Unsplash CDN: https://images.unsplash.com/photo-1528360983277-13d401cdc186
+  Narrow alley with red lantern and parked bikes

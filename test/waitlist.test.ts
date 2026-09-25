@@ -1,11 +1,12 @@
-import { exports } from "cloudflare:workers";
+import { env, exports } from "cloudflare:workers";
 import { describe, expect, it } from "vitest";
 
-async function post(email: unknown) {
+async function post(email: unknown, note?: unknown) {
+  const body = note === undefined ? { email } : { email, note };
   return exports.default.fetch("https://example.com/api/waitlist", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ email }),
+    body: JSON.stringify(body),
   });
 }
 
@@ -49,5 +50,43 @@ describe("waitlist API", () => {
       body: JSON.stringify({}),
     });
     expect(res.status).toBe(400);
+  });
+
+  it("任意の note を同じ行に保存する", async () => {
+    const note =
+      "intent: free-plan\ndates: Flexible — within 2 weeks\npace: Easy — frequent pauses";
+    const res = await post("notes@example.com", note);
+    expect(res.status).toBe(201);
+
+    const row = await env.DB.prepare("SELECT email, note FROM waitlist WHERE email = ?")
+      .bind("notes@example.com")
+      .first<{ email: string; note: string | null }>();
+    expect(row?.email).toBe("notes@example.com");
+    expect(row?.note).toBe(note);
+  });
+
+  it("空の note は保存せず、長すぎる note は 400 を返す", async () => {
+    const created = await post("blank-note@example.com", "   ");
+    expect(created.status).toBe(201);
+    const row = await env.DB.prepare("SELECT note FROM waitlist WHERE email = ?")
+      .bind("blank-note@example.com")
+      .first<{ note: string | null }>();
+    expect(row?.note).toBeNull();
+
+    const tooLong = await post("long-note@example.com", "a".repeat(2001));
+    expect(tooLong.status).toBe(400);
+  });
+
+  it("同じメールの再登録では最初の note を上書きしない", async () => {
+    const first = await post("keep-note@example.com", "intent: free-plan");
+    expect(first.status).toBe(201);
+
+    const second = await post("keep-note@example.com", "intent: premium-waitlist");
+    expect(second.status).toBe(200);
+
+    const row = await env.DB.prepare("SELECT note FROM waitlist WHERE email = ?")
+      .bind("keep-note@example.com")
+      .first<{ note: string | null }>();
+    expect(row?.note).toBe("intent: free-plan");
   });
 });
