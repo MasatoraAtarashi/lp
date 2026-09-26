@@ -2,7 +2,13 @@
 // wrangler vars / .dev.vars stay the source of truth. A placeholder never loads gtag.js.
 const GA_MEASUREMENT_ID_PLACEHOLDER = "G-XXXXXXXXXX";
 
-const PLAN_FIELDS = ["dates", "pace", "interests", "diet", "party"];
+// Answers travel to D1 inside the single free-text `note` column, so no schema
+// change is needed when the questionnaire changes — only this list.
+const PLAN_FIELDS = ["dates", "duration", "party", "pace", "food", "quiet", "notes"];
+
+// EN and JA share this script. All user-visible strings live in the HTML as
+// data-msg-* on the <form>, so a translation never has to touch JavaScript.
+const PAGE_LANG = document.documentElement.lang || "en";
 
 function isRealMeasurementId(id) {
   return (
@@ -19,7 +25,8 @@ function loadGoogleAnalytics(measurementId) {
   }
   window.gtag = gtag;
   gtag("js", new Date());
-  gtag("config", measurementId);
+  // Event names stay shared across locales; `language` separates EN from JA in reports.
+  gtag("config", measurementId, { language: PAGE_LANG });
 
   const script = document.createElement("script");
   script.async = true;
@@ -49,21 +56,31 @@ function fieldValue(form, name) {
   return String(el.value).trim();
 }
 
+function isChecked(form, name) {
+  const el = form.elements.namedItem(name);
+  return el instanceof HTMLInputElement && el.checked;
+}
+
+function message(form, key) {
+  return form.dataset["msg" + key] || "";
+}
+
 function planNote(form) {
-  const lines = ["intent: free-plan"];
+  const lines = ["intent: free-plan", `lang: ${PAGE_LANG}`];
   for (const name of PLAN_FIELDS) {
     const value = fieldValue(form, name);
     if (value) lines.push(`${name}: ${value}`);
   }
+  if (isChecked(form, "offerb")) lines.push("offer-b-interest: yes");
   return lines.join("\n");
 }
 
-async function submitWaitlist(form, message, note, successText) {
+async function submitWaitlist(form, messageEl, note) {
   const email = fieldValue(form, "email");
   const submit = form.querySelector("[type='submit']");
   if (submit instanceof HTMLButtonElement) submit.disabled = true;
-  message.textContent = "Sending…";
-  message.className = "form-message";
+  messageEl.textContent = message(form, "Sending");
+  messageEl.className = "form-message";
 
   try {
     const res = await fetch("/api/waitlist", {
@@ -73,19 +90,19 @@ async function submitWaitlist(form, message, note, successText) {
     });
 
     if (res.status === 201) {
-      message.textContent = successText;
-      message.className = "form-message success";
+      messageEl.textContent = message(form, "Created");
+      messageEl.className = "form-message success";
       form.reset();
     } else if (res.status === 200) {
-      message.textContent = "That email is already on the list. We'll be in touch.";
-      message.className = "form-message success";
+      messageEl.textContent = message(form, "Duplicate");
+      messageEl.className = "form-message success";
     } else {
-      message.textContent = "Check the email address and try again.";
-      message.className = "form-message error";
+      messageEl.textContent = message(form, "Invalid");
+      messageEl.className = "form-message error";
     }
   } catch {
-    message.textContent = "Couldn't send that. Check your connection and try again.";
-    message.className = "form-message error";
+    messageEl.textContent = message(form, "Network");
+    messageEl.className = "form-message error";
   } finally {
     if (submit instanceof HTMLButtonElement) submit.disabled = false;
   }
@@ -99,12 +116,7 @@ const premiumMessage = document.getElementById("premium-message");
 if (planForm instanceof HTMLFormElement && planMessage) {
   planForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    void submitWaitlist(
-      planForm,
-      planMessage,
-      planNote(planForm),
-      "Request received. We'll email a half-day walking plan — no payment, no booking.",
-    );
+    void submitWaitlist(planForm, planMessage, planNote(planForm));
   });
 }
 
@@ -114,8 +126,7 @@ if (premiumForm instanceof HTMLFormElement && premiumMessage) {
     void submitWaitlist(
       premiumForm,
       premiumMessage,
-      "intent: premium-waitlist",
-      "You're on the premium waitlist. We'll write when coordination opens.",
+      `intent: offer-b-waitlist\nlang: ${PAGE_LANG}`,
     );
   });
 }

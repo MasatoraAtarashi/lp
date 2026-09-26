@@ -9,19 +9,8 @@ Photo credits (Unsplash License / Pexels License — free commercial use)
   Unsplash CDN: https://images.unsplash.com/photo-1480796927426-f609979314bd
   Local wooden shopfront with noren (okonomiyaki/monjayaki), bikes
 
-03-street-walk.jpg
-  Unsplash CDN: https://images.unsplash.com/photo-1590559899731-a382839e5549
-  Local shopping street, bicycle, soft daylight
 
-04-quiet-town.jpg
-  Pexels: https://www.pexels.com/photo/2187604/
-  Direct: https://images.pexels.com/photos/2187604/pexels-photo-2187604.jpeg
-  Quiet traditional street, wooden buildings
 
-05-stone-path.jpg
-  Pexels: https://www.pexels.com/photo/2187605/
-  Direct: https://images.pexels.com/photos/2187605/pexels-photo-2187605.jpeg
-  Stone path between traditional houses
 
 06-evening.jpg
   Unsplash CDN: https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d
@@ -35,3 +24,8 @@ Photo credits (Unsplash License / Pexels License — free commercial use)
 08-lantern-shop.jpg
   Unsplash CDN: https://images.unsplash.com/photo-1528360983277-13d401cdc186
   Narrow alley with red lantern and parked bikes
+
+Removed: 03-street-walk.jpg (Osaka / Shinsekai), 04-quiet-town.jpg and
+05-stone-path.jpg (Tsumago-juku, Nagano). The brief for this page rules out
+stock photography from other cities, so those slots were dropped rather than
+reused. Remaining photos are Tokyo.
