@@ -1,6 +1,7 @@
 /**
  * Wrangler 設定の詳細: https://developers.cloudflare.com/workers/wrangler/configuration/
- * squat により生成。アプリ名は scaffold 時に決まり、D1 database_id は本番の everyday-japan-tour-db を指す。
+ * squat により生成。Worker 名 everyday-japan-tour は既存の本番リソース識別子なので変えない
+ * （サイト名は Real Shibuya）。D1 database_id は本番の everyday-japan-tour-db を指す。
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
@@ -12,6 +13,14 @@
   "assets": {
     "directory": "./public",
   },
+  // 公開ドメイン。polarissea.com は Cloudflare 管理なので、deploy 時に DNS レコードごと払い出される。
+  // *.workers.dev の URL も従来どおり生きる。
+  "routes": [
+    {
+      "pattern": "realshibuya.polarissea.com",
+      "custom_domain": true,
+    },
+  ],
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,

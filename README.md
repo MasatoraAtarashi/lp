@@ -54,6 +54,7 @@ http://localhost:8787 で開く。フォームから登録を試すとローカ�
 - EN が主（`hreflang="x-default"` も EN）
 - ドメインを変えるときは `public/index.html` と `public/ja/index.html` の canonical・`og:url`・`hreflang`・`og:image`、および `test/i18n-pages.test.ts` の `ORIGIN` を同時に直す（テストが不一致を検出します）
 - Worker 名 `everyday-japan-tour` は既存の本番リソース識別子なので変えていません。`*.workers.dev` の URL も従来どおり生きます
+- カスタムドメインは `wrangler.jsonc` の `routes`（`custom_domain: true`）で持っています。polarissea.com は Cloudflare 管理なので、`wrangler deploy` 時に DNS レコードごと払い出されます
 
 ## 言語の切り替え
 
