@@ -5,27 +5,24 @@ Photo credits (Unsplash License / Pexels License — free commercial use)
   Page: https://unsplash.com/photos/an-empty-street-with-a-white-fence-and-trees-8REDBg52u6g
   Soft daylight Tokyo street with sakura
 
-02-shop.jpg
-  Unsplash CDN: https://images.unsplash.com/photo-1480796927426-f609979314bd
-  Local wooden shopfront with noren (okonomiyaki/monjayaki), bikes
 
 
 
 
-06-evening.jpg
-  Unsplash CDN: https://images.unsplash.com/photo-1524413840807-0c3cb6fa808d
-  Canal with sakura & lanterns (Nakameguro / Meguro River vibe)
 
 07-alley.jpg
   Unsplash CDN: https://images.unsplash.com/photo-1723127194356-8bfb41aaec4e
   Page: https://unsplash.com/photos/a-narrow-alleyway-with-a-light-on-at-night--TDSa4oIxLA
   Narrow Tokyo alley at night
 
-08-lantern-shop.jpg
-  Unsplash CDN: https://images.unsplash.com/photo-1528360983277-13d401cdc186
-  Narrow alley with red lantern and parked bikes
 
 Removed: 03-street-walk.jpg (Osaka / Shinsekai), 04-quiet-town.jpg and
 05-stone-path.jpg (Tsumago-juku, Nagano). The brief for this page rules out
 stock photography from other cities, so those slots were dropped rather than
 reused. Remaining photos are Tokyo.
+
+Also removed: 02-shop.jpg (a named monjayaki shopfront in Tsukishima),
+06-evening.jpg (Meguro river cherry blossoms at night) and 08-lantern-shop.jpg
+(a neon drinking alley). The brief rules out shop names on the page, other
+neighbourhoods, and travel-advert photography. Two photos remain; both are
+placeholders until the owner shoots the real ones.

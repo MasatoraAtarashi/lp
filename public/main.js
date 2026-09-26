@@ -4,7 +4,7 @@ const GA_MEASUREMENT_ID_PLACEHOLDER = "G-XXXXXXXXXX";
 
 // Answers travel to D1 inside the single free-text `note` column, so no schema
 // change is needed when the questionnaire changes — only this list.
-const PLAN_FIELDS = ["dates", "duration", "party", "pace", "food", "quiet", "notes"];
+const PLAN_FIELDS = ["dates", "duration", "party", "food", "quiet", "notes"];
 
 // EN and JA share this script. All user-visible strings live in the HTML as
 // data-msg-* on the <form>, so a translation never has to touch JavaScript.
