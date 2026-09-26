@@ -89,7 +89,9 @@ figure {
   gap: 1rem;
   padding: 1.35rem 2rem;
   color: var(--white);
-  mix-blend-mode: difference;
+  /* difference ブレンドは写真の明暗で文字が沈むので使わない。
+     薄い影だけで、明るい空でも暗い路地でも読めるようにする。 */
+  text-shadow: 0 1px 12px rgba(20, 18, 14, 0.55);
 }
 
 .logo {
@@ -138,9 +140,9 @@ figure {
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(20, 18, 14, 0.55) 0%,
-    rgba(20, 18, 14, 0.12) 42%,
-    rgba(20, 18, 14, 0.18) 100%
+    rgba(20, 18, 14, 0.78) 0%,
+    rgba(20, 18, 14, 0.5) 45%,
+    rgba(20, 18, 14, 0.34) 100%
   );
 }
 
@@ -638,7 +640,8 @@ input:focus-visible {
 .closing__veil {
   position: absolute;
   inset: 0;
-  background: rgba(18, 16, 14, 0.42);
+  /* 末尾はフォームを重ねるので、写真の明暗に関係なく読める濃さにする */
+  background: rgba(18, 16, 14, 0.64);
 }
 .closing__content {
   position: relative;
@@ -758,5 +761,152 @@ input:focus-visible {
 @media (max-width: 480px) {
   .hero h1 {
     font-size: 2.35rem;
+  }
+}
+
+/* ——— Language switch (header + footer) ——— */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.lang-switch a {
+  opacity: 0.6;
+  transition: opacity 0.25s var(--ease);
+}
+.lang-switch a:hover {
+  opacity: 0.95;
+}
+/* 現在の言語だけ下線＋全不透明にして、どちらを見ているかを一目で分かるようにする */
+.lang-switch a[aria-current="page"] {
+  opacity: 1;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+}
+.lang-switch a + a::before {
+  content: "／";
+  margin-right: 0.6rem;
+  opacity: 0.45;
+}
+
+/* ——— Hero call to action ——— */
+.hero__cta {
+  display: inline-block;
+  margin-top: 1.75rem;
+  padding: 0.85rem 2rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--white);
+  border: 1px solid rgba(255, 252, 248, 0.55);
+  transition:
+    background 0.25s var(--ease),
+    color 0.25s var(--ease);
+}
+.hero__cta:hover {
+  background: var(--white);
+  color: var(--ink);
+}
+
+.intro__areas {
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  border-top: 1px solid var(--line);
+  padding-top: 1.1rem;
+}
+
+/* ——— Extra form controls ——— */
+.field textarea {
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--ink);
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+.field textarea:focus {
+  border-color: var(--ink);
+}
+.field input::placeholder,
+.field textarea::placeholder {
+  color: rgba(44, 43, 40, 0.38);
+}
+
+/* チェックボックスは下線入力のスタイルを継がせない */
+.field--check {
+  margin-top: 0.25rem;
+}
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.check input[type="checkbox"] {
+  appearance: auto;
+  border: none;
+  border-bottom: none;
+  padding: 0;
+  margin: 0.25rem 0 0;
+  width: auto;
+  accent-color: var(--ink);
+  flex: none;
+}
+
+/* ——— Japanese typography ———
+   Cormorant Garamond に日本語グリフが無いので、明朝系へ落として雰囲気を合わせる */
+:lang(ja) h1,
+:lang(ja) h2,
+:lang(ja) h3 {
+  font-family: "Cormorant Garamond", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+  line-height: 1.32;
+}
+:lang(ja) .hero h1 {
+  max-width: 16ch;
+}
+:lang(ja) .hero__promise {
+  max-width: 34ch;
+}
+:lang(ja) .eyebrow,
+:lang(ja) .lang-switch,
+:lang(ja) .field label {
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 900px) {
+  .header-nav {
+    gap: 1rem;
+  }
+  .lang-switch {
+    font-size: 0.68rem;
+  }
+  .header-cta {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-cta {
+    display: none;
   }
 }
